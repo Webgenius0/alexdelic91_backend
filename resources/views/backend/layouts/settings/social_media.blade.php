@@ -90,12 +90,12 @@
                                             <option class="dropdown-item" value="linkedin"
                                                 {{ $link->social_media == 'linkedin' ? 'selected' : '' }}>Linkedin
                                             </option>
-                                            {{-- <option class="dropdown-item" value="youtube"
+                                            <option class="dropdown-item" value="youtube"
                                                 {{ $link->social_media == 'youtube' ? 'selected' : '' }}>YouTube
                                             </option>
                                             <option class="dropdown-item" value="threads"
                                                 {{ $link->social_media == 'threads' ? 'selected' : '' }}>Threads
-                                            </option> --}}
+                                            </option>
                                         </select>
                                         <input type="url" class="form-control" aria-label="Text input with dropdown button"
                                             name="profile_link[]"
@@ -109,7 +109,7 @@
                             </div>
 
                             <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-primary" title="Submit the form">Submit</button>
+                                <button type="submit" class="btn btn-success" title="Submit the form">Submit</button>
                                 <a href="{{ route('admin.dashboard') }}" class="btn btn-danger me-2"
                                     title="Cancel and go back to the dashboard">Cancel</a>
                             </div>
@@ -128,7 +128,7 @@
         function addSocialField() {
             const socialFieldsContainer = document.getElementById("social_media_container");
 
-            if (socialFieldsCount < 4) {
+            if (socialFieldsCount < 6) {
                 const newSocialField = document.createElement("div");
                 newSocialField.className = "social_media input-group mb-3";
                 newSocialField.innerHTML =
@@ -139,8 +139,8 @@
                 <option class="dropdown-item" value="instagram">Instagram</option>
                 <option class="dropdown-item" value="twitter">Twitter</option>
                 <option class="dropdown-item" value="linkedin">Linkedin</option>
-
-
+                <option class="dropdown-item" value="youtube">YouTube</option>
+                <option class="dropdown-item" value="threads">Threads</option>
 
             </select>
             <input type="url" class="form-control" aria-label="Text input with dropdown button" name="profile_link[]">

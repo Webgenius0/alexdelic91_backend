@@ -38,7 +38,7 @@
                 <div class="card p-5">
                     <div class="card-style mb-30">
                         <div class="d-flex justify-content-end mb-3">
-                            <a href="{{ route('dynamic_page.create') }}" class="btn btn-primary">Add New
+                            <a href="{{ route('dynamic_page.create') }}" class="btn btn-success">Add New
                                 Page</a>
                         </div>
                         <div class="table-wrapper table-responsive">
