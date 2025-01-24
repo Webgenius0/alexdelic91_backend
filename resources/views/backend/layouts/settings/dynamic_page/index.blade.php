@@ -37,10 +37,10 @@
             <div class="col-lg-12">
                 <div class="card p-5">
                     <div class="card-style mb-30">
-                        {{-- <div class="d-flex justify-content-end mb-3">
+                        <div class="d-flex justify-content-end mb-3">
                             <a href="{{ route('dynamic_page.create') }}" class="btn btn-primary">Add New
                                 Page</a>
-                        </div> --}}
+                        </div>
                         <div class="table-wrapper table-responsive">
                             <table id="data-table" class="table">
                                 <thead>

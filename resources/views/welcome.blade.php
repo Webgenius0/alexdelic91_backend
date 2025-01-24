@@ -34,7 +34,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: #3b82f6;
+            background-color: #59f561;
             text-align: center;
         }
 
@@ -86,7 +86,7 @@
         }
 
         .bg-blue-500 {
-            background-color: #3b82f6;
+            background-color: #41f55f;
         }
 
         .login-btn,
@@ -125,7 +125,7 @@
 </head>
 
 <body class="w-screen h-screen bg-blue-500 flex justify-center items-center text-center">
-    <div class="Box">
+    {{-- <div class="Box">
         <h1 class="text-6xl font-bold text-white">Laravel API Stater Kit.</h1>
         <p class="text-md mt-4 text-white">
             <a href="https://github.com/rhishi-kesh" class="hover:underline link" target="_blank">
@@ -141,7 +141,7 @@
                 <span class="author">Rhishi Kesh Bhowmik💕</span>
             </a>
         </p>
-    </div>
+    </div> --}}
     <div>
         @if (Route::has('login'))
             @auth

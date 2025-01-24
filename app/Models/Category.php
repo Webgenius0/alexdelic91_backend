@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SocialMedia extends Model {
-    use HasFactory, SoftDeletes;
-
+class Category extends Model
+{
     protected $guarded = [];
 
     protected $casts = [
@@ -16,6 +13,7 @@ class SocialMedia extends Model {
     ];
 
     protected $hidden = [
+        'status',
         'created_at',
         'updated_at',
     ];

@@ -2,21 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SocialMedia extends Model {
-    use HasFactory, SoftDeletes;
-
+class ServiceProviderWorkingDay extends Model
+{
     protected $guarded = [];
 
     protected $casts = [
         'id' => 'integer',
+        'service_provider_id' => 'integer',
     ];
 
     protected $hidden = [
         'created_at',
         'updated_at',
     ];
+
+    public function serviceProvider()
+    {
+        return $this->belongsTo(ServiceProviderProfile::class, 'service_provider_id');
+    }
 }
