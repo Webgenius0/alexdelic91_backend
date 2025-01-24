@@ -86,7 +86,7 @@
         }
 
         .bg-blue-500 {
-            background-color: #41f55f;
+            background-color: #50CD89;
         }
 
         .login-btn,

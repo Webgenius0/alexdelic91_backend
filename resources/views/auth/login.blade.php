@@ -11,7 +11,7 @@
     @include('backend.partials.style')
 </head>
 
-<body id="kt_body" class="auth-bg" style="background: #3B82F6">
+<body id="kt_body" class="auth-bg" style="background: #50CD89">
     <div class="d-flex flex-column flex-root">
         <div class="d-flex flex-column flex-lg-row flex-column-fluid">
             <div class="d-flex flex-column flex-lg-row-fluid py-10">
@@ -59,7 +59,7 @@
                             </div>
 
                             <div class="text-center">
-                                <button type="submit" id="kt_sign_in_submit" class="btn btn-lg btn-primary w-100 mb-5">
+                                <button type="submit" id="kt_sign_in_submit" class="btn btn-lg btn-success w-100 mb-5">
                                     <span class="indicator-label">
                                         Log In
                                     </span>

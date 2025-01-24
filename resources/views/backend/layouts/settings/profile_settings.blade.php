@@ -89,7 +89,7 @@
                                     </div>
 
                                     <div class="col-12 mt-4">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                        <button type="submit" class="btn btn-success">Submit</button>
                                     </div>
                                 </div>
                             </form>
@@ -149,7 +149,7 @@
                                     </div>
 
                                     <div class="col-12 mt-4">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                        <button type="submit" class="btn btn-success">Submit</button>
                                         <a href="{{ route('admin.dashboard') }}" class="btn btn-danger me-2">Cancel</a>
                                     </div>
                                 </div>
