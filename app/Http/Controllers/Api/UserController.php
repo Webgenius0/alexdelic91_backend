@@ -3,11 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ServiceProviderImage;
+use App\Models\ServiceProviderProfile;
+use App\Models\ServiceProviderSubcategory;
+use App\Models\ServiseProviderWorkDay;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller {
     use ApiResponse;
@@ -131,4 +137,93 @@ class UserController extends Controller {
             return $this->error([], $e->getMessage(), 500);
         }
     }
+
+    public function create(Request $request)
+    {
+        dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'business_name'    => 'required|string|max:255',
+            'category_id' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'required|numeric',
+            'service_location_id' => 'required',
+            'description' => 'required',
+            'city' => 'required|string|max:255',
+            'division' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:255',
+            'start_time' => 'required|string',
+            'end_time' => 'required|string',
+            'images.*' => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
+            'subcategories.*' => 'required',
+            'days.*' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error($validator->errors(), "Validation Error", 422);
+        }
+
+        if (Auth::check()) {
+            $user = Auth::user();
+        }
+
+        if (!$user) {
+            return $this->error([], "User Not Found", 404);
+        }
+
+        try{
+            DB::beginTransaction();
+
+            $service_provider = ServiceProviderProfile::create([
+                'user_id' => $user->id,
+                'business_name' => $request->business_name,
+                'category_id' => $request->category_id,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'service_location_id' => $request->service_location_id,
+                'description' => $request->description,
+                'city' => $request->city,
+                'division' => $request->division,
+                'zip_code' => $request->zip_code,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+
+            ]);
+
+            // gallery images
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $imageName    = uploadImage($image, 'service/images');
+                    ServiceProviderImage::create([
+                        'service_provider_id' => $service_provider->id,
+                        'images' => $imageName,
+                    ]);
+                }
+            }
+
+            // subcategories
+            if ($request->subcategories) {
+                foreach ($request->subcategories as $subcategory_id) {
+                    ServiceProviderSubcategory::create([
+                        'service_provider_id' => $service_provider->id,
+                        'subcategory_id' => $subcategory_id,
+                    ]);
+                }
+            }
+
+            if ($request->days) {
+                foreach ($request->days as $day_id) {
+                    ServiseProviderWorkDay::create([
+                        'service_provider_id' => $service_provider->id,
+                        'day_id' => $day_id,
+                    ]);
+                }
+            }
+            DB::commit();
+            return $this->success($service_provider, 'Service Provider created successfully', 200);
+        }catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error([], $e->getMessage(), 500);
+        }
+    }
+
 }
