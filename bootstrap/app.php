@@ -25,6 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin')
                 ->group(base_path('routes/admin_setting.php'));
 
+            Route::middleware(['web', 'auth', 'admin'])
+                ->prefix('admin')
+                ->group(base_path('routes/mizan_backend.php'));
+
             Route::middleware(['web'])
                 ->group(base_path('routes/frontend.php'));
         }
