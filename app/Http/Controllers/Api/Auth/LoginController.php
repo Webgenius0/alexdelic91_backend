@@ -84,6 +84,14 @@ class LoginController extends Controller {
 
         $userData = User::where('email', $request->email)->first();
 
+        $flags = false;
+
+        if($userData->serviceProviderProfile != null){ 
+            $flags = true;
+        }else{
+            $flags = false;
+        }
+
         if ($userData && Hash::check($request->password, $userData->password)) {
             if($userData->email_verified_at == null) {
 
@@ -104,8 +112,12 @@ class LoginController extends Controller {
         } else {
             return $this->error([], 'Invalid credentials', 401);
         }
+        $data = [
+            'userData' => $userData,
+            'is_service_provider_info' => $flags
+        ];
 
-        return $this->success($userData, 'User authenticated successfully', 200);
+        return $this->success($data, 'User authenticated successfully', 200);
     }
 
     /**
