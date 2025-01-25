@@ -53,6 +53,45 @@
                 </div>
 
                 <div data-kt-menu-trigger="click"
+                class="menu-item {{ request()->routeIs(['admin.categories.*', 'admin.subcategories.*']) ? 'active show' : '' }} menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <i class="fa-regular fa-file fs-2"></i>
+                    </span>
+                    <span class="menu-title">Service Category</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a href="{{ route('admin.categories.index') }}"
+                            class="menu-link {{ request()->routeIs(['admin.categories.*']) ? 'active show' : '' }}">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">Category</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a href="{{ route('admin.subcategories.index') }}"
+                            class="menu-link {{ request()->routeIs(['admin.subcategories.*']) ? 'active show' : '' }}">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">Sub Category</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="menu-content">
+                    <div class="separator mx-1 my-2"></div>
+                </div>
+            </div>
+
+                <div data-kt-menu-trigger="click"
                     class="menu-item {{ request()->routeIs(['faq.*', 'dynamic_page.*']) ? 'active show' : '' }} menu-accordion">
                     <span class="menu-link">
                         <span class="menu-icon">
