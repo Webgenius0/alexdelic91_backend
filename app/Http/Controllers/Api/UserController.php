@@ -140,7 +140,7 @@ class UserController extends Controller {
 
     public function create(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'business_name'    => 'required|string|max:255',
             'category_id' => 'required|string|max:255',
