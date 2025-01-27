@@ -52,6 +52,7 @@ class RegisterController extends Controller {
         $validator = Validator::make($request->all(), [
             'name'           => 'required|string|max:255',
             'email'          => 'required|email|unique:users,email',
+            'role'           => 'required|string',
             'password'       => [
                 'required',
                 'string',
@@ -68,19 +69,36 @@ class RegisterController extends Controller {
             return $this->error($validator->errors(), "Validation Error", 422);
         }
 
+
         try {
             // Find the user by ID
             $user                 = new User();
             $user->name           = $request->input('name');
             $user->email          = $request->input('email');
             $user->password       = Hash::make($request->input('password')); // Hash the password
+            $user->role           = $request->input('role');
             $user->agree_to_terms = $request->input('agree_to_terms');
 
             $user->save();
 
+            if($user->role == 'service_provider') {
+                if($user->serviceProviderProfile != null){
+                    $flags = true;
+                }else{
+                    $flags = false;
+                }
+            }else{
+                $flags = true;
+            }
+            
             $this->sendOtp($user);
 
-            return $this->success($user, 'Verification email sent', 201);
+            $data = ([
+                'user' => $user,
+                'is_service_provider_info' => $flags
+            ]);
+
+            return $this->success($data, 'Verification email sent', 201);
         } catch (\Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }

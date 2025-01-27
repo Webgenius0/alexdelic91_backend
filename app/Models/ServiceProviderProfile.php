@@ -38,7 +38,7 @@ class ServiceProviderProfile extends Model
 
     public function workingDays()
     {
-        return $this->hasMany(ServiceProviderWorkingDay::class, 'service_provider_id');
+        return $this->hasMany(ServiseProviderWorkDay::class, 'service_provider_id');
     }
 
     public function serviceProviderImage()
