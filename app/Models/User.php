@@ -75,4 +75,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(ServiceProviderProfile::class);
     }
 
+    /**
+     * Get the user's profile.
+     * @return HasMany
+     */
+    public function requestedHelp(): HasMany
+    {
+        return $this->hasMany(HelpCenter::class);
+    }
 }

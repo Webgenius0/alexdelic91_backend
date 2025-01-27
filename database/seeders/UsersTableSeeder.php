@@ -43,6 +43,44 @@ class UsersTableSeeder extends Seeder
                 'remember_token' => Str::random(10),
                 'created_at' => now(),
             ],
+            // make more 4 people rafi,saidur,and rkb and mijanur all admin
+            [
+                'name' => 'Rafi',
+                'email' => 'rafi@gmail.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('12345678'),
+                'role' => 'admin',
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+            ],
+            [
+                'name' => 'Saidur',
+                'email' => 'saidur@gmail.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('12345678'),
+                'role' => 'admin',
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+            ],
+            [
+                'name' => 'Rkb',
+                'email' => 'rkb@gmail.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('12345678'),
+                'role' => 'admin',
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+            ],
+
+            [
+                'name' => 'Mijanur',
+                'email' => 'mijanur@gmail.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('12345678'),
+                'role' => 'admin',
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+            ],
         ]);
     }
 }
