@@ -62,6 +62,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::delete('/delete', 'deleteUser');
 
         Route::post('/service/provider/profile/create','create');
+        Route::get('/days', 'getDays');
     });
 
 });
