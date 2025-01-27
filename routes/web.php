@@ -1,5 +1,16 @@
 <?php
 
+use App\Models\DynamicPage;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
+
+Route::get('/privacy-policy', function () {
+    $privacyPolicy = DynamicPage::where('page_slug', 'privacy-and-policy')->first();
+    return response()->json($privacyPolicy);
+});
+
+Route::get('/terms-and-conditions', function () {
+    $termsAndConditions = DynamicPage::where('page_slug', 'terms-and-conditions')->first();
+    return response()->json($termsAndConditions);
+});

@@ -37,10 +37,7 @@
             <div class="col-lg-12">
                 <div class="card p-5">
                     <div class="card-style mb-30">
-                        <div class="d-flex justify-content-end mb-3">
-                            <a href="{{ route('dynamic_page.create') }}" class="btn btn-success">Add New
-                                Page</a>
-                        </div>
+                    
                         <div class="table-wrapper table-responsive">
                             <table id="data-table" class="table">
                                 <thead>
@@ -202,34 +199,6 @@
                 }
             });
         }
-        // Delete Button
-        function deleteItem(id) {
-            let url = '{{ route('dynamic_page.destroy', ':id') }}';
-            let csrfToken = '{{ csrf_token() }}';
-            $.ajax({
-                type: "DELETE",
-                url: url.replace(':id', id),
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                success: function(resp) {
-                    console.log(resp);
-                    // Reloade DataTable
-                    $('#data-table').DataTable().ajax.reload();
-                    if (resp.success === true) {
-                        // show toast message
-                        toastr.success(resp.message);
 
-                    } else if (resp.errors) {
-                        toastr.error(resp.errors[0]);
-                    } else {
-                        toastr.error(resp.message);
-                    }
-                },
-                error: function(error) {
-                    // location.reload();
-                }
-            })
-        }
     </script>
 @endpush
