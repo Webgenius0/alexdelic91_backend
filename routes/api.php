@@ -61,16 +61,19 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::post('/data/update', 'userUpdate');
         Route::post('/logout', 'logoutUser');
         Route::delete('/delete', 'deleteUser');
+
+        Route::post('/service/provider/profile/create','create');
+        Route::get('/days', 'getDays');
     });
 
 });
 
-// Category 
+// Category
 // Route::group(['middleware' => ['jwt.verify']], function() {
 
 //     Route::controller(CategoryCategoryController::class)->group(function () {
 //         Route::get('/categories', 'categories');
-    
+
 //     });
 
 // });
