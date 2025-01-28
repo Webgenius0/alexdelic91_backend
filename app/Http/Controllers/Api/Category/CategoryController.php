@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     use ApiResponse;
     
-    public $categories;
+    public $categories,$subCategories;
 
     private $categoryRepository;
 
@@ -28,9 +28,9 @@ class CategoryController extends Controller
 
     public function categories() : JsonResponse
     {
-        $categories = $this->categoryRepository->getAllCategories();
+        $this->categories = $this->categoryRepository->getAllCategories();
 
-        return $this->success($categories, 'Categories fetched successfully', 200);
+        return $this->success($this->categories, 'Categories fetched successfully', 200);
     }
     
 
@@ -42,9 +42,9 @@ class CategoryController extends Controller
      */
     public function subCategories($category) : JsonResponse
     {
-        $subCategories = $this->categoryRepository->getSubCategories($category);
+        $this->subCategories = $this->categoryRepository->getSubCategories($category);
 
-        return $this->success($subCategories, 'Sub Categories fetched successfully', 200);
+        return $this->success($this->subCategories, 'Sub Categories fetched successfully', 200);
     }
 
     

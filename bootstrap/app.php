@@ -21,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
             Route::middleware('api')
                 ->prefix('api')
+                ->group(base_path('routes/rafi_api.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
                 ->group(base_path('routes/mizan_api.php'));
 
             Route::middleware('api')
