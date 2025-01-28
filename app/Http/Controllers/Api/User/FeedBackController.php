@@ -34,20 +34,19 @@ class FeedBackController extends Controller
     
        
         $existingFeedback = Feedback::where('user_id', $user->id)
-            ->where('service_provider_id', $id)
+            ->where('booking_id', $id)
             ->first();
     
         if ($existingFeedback) {
-           
             return $this->error($existingFeedback, "Feedback Already Given", 200);
             
         }else {
            
             $data = Feedback::create([
-                'user_id'             => $user->id,
-                'service_provider_id' => $id,
-                'rating'              => $request->rating,
-                'feedback'            => $request->feedback,
+                'user_id'    => $user->id,
+                'booking_id' => $id,
+                'rating'     => $request->rating,
+                'feedback'   => $request->feedback,
             ]);
 
             if (!$data) {
@@ -63,24 +62,32 @@ class FeedBackController extends Controller
     public function getFeedback()
     {
         $user = auth()->user();
-
+    
         if (! $user) {
             return $this->error([], "User Unauthorized", 404);
         }
-
-        $data = Feedback::with('serviceProvider:id,name')
+    
+        $data = Feedback::with([
+                'booking' => function ($query) {
+                    $query->select('id', 'user_id', 'service_provider_id');
+                },
+                'booking.serviceProvider' => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
             ->where('user_id', $user->id)
             ->get()
             ->map(function ($feedback) {
                 $feedback->formatted_created_at = $feedback->created_at->format('M d, Y');
                 return $feedback;
             });
-
+    
         if ($data->isEmpty()) {
             return $this->error([], "Feedback not found", 404);
         }
-
+    
         return $this->success($data, "Feedback fetched successfully", 200);
     }
+    
 
 }

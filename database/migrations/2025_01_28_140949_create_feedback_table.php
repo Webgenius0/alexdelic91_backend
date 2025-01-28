@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Ensure the bookings table exists and has the 'id' column
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('service_provider_id')->constrained('users', 'id')->onDelete('cascade');
-            $table->text('feedback')->nullable();
-            $table->integer('rating');
+            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
+            $table->text('feedback')->nullable(); 
+            $table->integer('rating');  
             $table->timestamps();
         });
     }
