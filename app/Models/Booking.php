@@ -75,4 +75,9 @@ class Booking extends Model
     {
         return $this->belongsTo(User::class, 'service_provider_id');
     }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class);
+    }
 }

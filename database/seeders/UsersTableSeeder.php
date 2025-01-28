@@ -45,7 +45,7 @@ class UsersTableSeeder extends Seeder
             ],
             // make more 4 people rafi,saidur,and rkb and mijanur all admin
             [
-                'name' => 'Rafi',
+                'name' => 'Example Business',
                 'email' => 'rafi@gmail.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('12345678'),
@@ -54,7 +54,7 @@ class UsersTableSeeder extends Seeder
                 'created_at' => now(),
             ],
             [
-                'name' => 'Saidur',
+                'name' => 'Example Business 3',
                 'email' => 'saidur@gmail.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('12345678'),
@@ -63,7 +63,7 @@ class UsersTableSeeder extends Seeder
                 'created_at' => now(),
             ],
             [
-                'name' => 'Rkb',
+                'name' => 'Example Business 4',
                 'email' => 'rkb@gmail.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('12345678'),
@@ -73,7 +73,7 @@ class UsersTableSeeder extends Seeder
             ],
 
             [
-                'name' => 'Mijanur',
+                'name' => 'Example Business 2',
                 'email' => 'mizanur@gmail.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('12345678'),
