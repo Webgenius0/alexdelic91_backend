@@ -46,8 +46,5 @@ class ServiceProviderProfile extends Model
         return $this->hasMany(ServiceProviderImage::class, 'service_provider_id');
     }
 
-    public function feedbacksReceived()
-    {
-        return $this->hasMany(Feedback::class, 'service_provider_id');
-    }
+    
 }

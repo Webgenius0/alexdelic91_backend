@@ -80,4 +80,5 @@ class Booking extends Model
     {
         return $this->hasMany(Feedback::class);
     }
+    
 }
