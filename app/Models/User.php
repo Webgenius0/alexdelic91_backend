@@ -71,6 +71,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(ServiceProviderProfile::class);
     }
 
+<<<<<<< HEAD
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class, 'user_id');
@@ -91,4 +92,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Feedback::class, 'service_provider_id');
     }
 
+=======
+    /**
+     * Get the user's profile.
+     * @return HasMany
+     */
+    public function requestedHelp(): HasMany
+    {
+        return $this->hasMany(HelpCenter::class);
+    }
+>>>>>>> 143079173d23f49998641d4b9d613f52c16711e5
 }

@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Api\Category;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Repositories\Contracts\CategoryRepositoryInterface;
-use Illuminate\Http\Request;
+use App\Interface\CategoryRepositoryInterface;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 

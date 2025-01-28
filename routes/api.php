@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Category\CategoryController;
+use App\Http\Controllers\Api\HelpCenter\HelpCenterController;
+use App\Http\Controllers\Api\Provider\ProviderController;
 use App\Http\Controllers\Api\UserController;
 
 /*
@@ -69,14 +71,31 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 });
 
 // Category
-// Route::group(['middleware' => ['jwt.verify']], function() {
+Route::group(['middleware' => ['jwt.verify']], function() {
 
-//     Route::controller(CategoryCategoryController::class)->group(function () {
-//         Route::get('/categories', 'categories');
+    Route::controller(CategoryController::class)->group(function () {
+        Route::get('/categories', 'categories');
+        Route::get('/sub-categories/{category}','subCategories');
 
-//     });
+    });
 
-// });
+});
 
-Route::get('/categories', [CategoryController::class, 'categories']);
-Route::get('/sub-categories/{category}', [CategoryController::class, 'subCategories']);
+
+// Help Center
+
+Route::group(['middleware' => ['jwt.verify']], function() {
+    Route::controller(HelpCenterController::class)->group(function() {
+        Route::post('/request-for-help','requestForHelp');
+    });
+});
+
+// Provider 
+
+Route::group(['middleware' => ['jwt.verify']], function() {
+    Route::controller(ProviderController::class)->group(function() {
+        Route::get('/all-providers','allProviders');
+    });
+});
+
+
