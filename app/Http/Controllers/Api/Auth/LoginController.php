@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
@@ -15,7 +14,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class LoginController extends Controller {
+class LoginController extends Controller
+{
 
     use ApiResponse;
 
@@ -26,7 +26,8 @@ class LoginController extends Controller {
      * @return void
      */
 
-    private function sendOtp($user) {
+    private function sendOtp($user)
+    {
         $code = rand(1000, 9999);
 
         // Store verification code in the database
@@ -48,7 +49,8 @@ class LoginController extends Controller {
      * @return void
      */
 
-     private function verifyOTP($user) {
+    private function verifyOTP($user)
+    {
         $code = rand(1000, 9999);
 
         // Store verification code in the database
@@ -56,7 +58,7 @@ class LoginController extends Controller {
             ['user_id' => $user->id],
             [
                 'verification_code' => $code,
-                'expires_at' => Carbon::now()->addMinutes(15)
+                'expires_at'        => Carbon::now()->addMinutes(15),
             ]
         );
 
@@ -70,10 +72,11 @@ class LoginController extends Controller {
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-     public function userLogin(Request $request) {
+    public function userLogin(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required'
+            'email'    => 'required|email|exists:users,email',
+            'password' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -84,37 +87,35 @@ class LoginController extends Controller {
 
         $userData = User::where('email', $request->email)->first();
 
-        $flags = false;
-
-        if($userData->serviceProviderProfile != null){ 
-            $flags = true;
-        }else{
-            $flags = false;
-        }
-
         if ($userData && Hash::check($request->password, $userData->password)) {
-            if($userData->email_verified_at == null) {
 
-                $this->verifyOTP($userData);
-
-                $userData->setAttribute('token', null);
-
-            } else {
-
-                if (!$token = JWTAuth::attempt($credentials)) {
-                    return $this->error([], 'Invalid credentials', 401);
-                }
-
-                $userData = auth()->user();
-
-                $userData->setAttribute('token', $token);
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return $this->error([], 'Invalid credentials', 401);
             }
+
+            $userData = auth()->user();
+
+            $userData->setAttribute('token', $token);
+
         } else {
             return $this->error([], 'Invalid credentials', 401);
         }
+
+        if ($userData->role == 'service_provider') {
+
+            if ($userData->serviceProviderProfile != null) {
+                $flags = true;
+            } else {
+                $flags = false;
+            }
+        } else {
+            $flags = true;
+
+        }
+
         $data = [
-            'userData' => $userData,
-            'is_service_provider_info' => $flags
+            'userData'                 => $userData,
+            'is_service_provider_info' => $flags,
         ];
 
         return $this->success($data, 'User authenticated successfully', 200);
@@ -127,7 +128,8 @@ class LoginController extends Controller {
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-    public function emailVerify(Request $request) {
+    public function emailVerify(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
@@ -156,7 +158,8 @@ class LoginController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
 
-    public function otpResend(Request $request) {
+    public function otpResend(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
@@ -184,7 +187,8 @@ class LoginController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function otpVerify(Request $request) {
+    public function otpVerify(Request $request)
+    {
 
         // Validate the request
         $validator = Validator::make($request->all(), [
@@ -229,7 +233,8 @@ class LoginController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
 
-    public function resetPassword(Request $request) {
+    public function resetPassword(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email'    => 'required|email|exists:users,email',
             'password' => [
