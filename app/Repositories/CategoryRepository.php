@@ -3,9 +3,9 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use App\Models\Subcategory;
-use App\Interface\CategoryRepositoryInterface;
+use App\Interface\CategoryInterface;
 
-class CategoryRepository implements CategoryRepositoryInterface
+class CategoryRepository implements CategoryInterface
 {
     /**
      * Get all categories

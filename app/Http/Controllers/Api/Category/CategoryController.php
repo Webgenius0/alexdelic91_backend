@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Category;
 
 use App\Http\Controllers\Controller;
-use App\Interface\CategoryRepositoryInterface;
+use App\Interface\CategoryInterface;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 
@@ -15,7 +15,7 @@ class CategoryController extends Controller
 
     private $categoryRepository;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepository)
+    public function __construct(CategoryInterface $categoryRepository)
     {
         $this->categoryRepository = $categoryRepository;
     }

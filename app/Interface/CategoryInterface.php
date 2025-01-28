@@ -2,7 +2,7 @@
 
 namespace App\Interface;
 
-interface CategoryRepositoryInterface
+interface CategoryInterface
 {
     public function getAllCategories();
     public function getSubCategories($category);
