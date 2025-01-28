@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\web\Backend\CategoryController;
-use App\Http\Controllers\web\Backend\SubcategoryController;
+use App\Http\Controllers\Web\Backend\CategoryController;
+use App\Http\Controllers\Web\Backend\SubcategoryController;
 
 Route::controller(CategoryController::class)->group(function () {
     Route::get('/category', 'index')->name('admin.categories.index');

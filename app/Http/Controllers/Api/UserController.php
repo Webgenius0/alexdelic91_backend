@@ -6,6 +6,7 @@ use App\Models\Day;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use App\Models\ServiceLocation;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
@@ -147,6 +148,8 @@ class UserController extends Controller {
             'business_name' => 'required|string|max:255',
             'category_id' => 'required|string|max:255',
             'address' => 'required|string|max:255',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'phone' => 'required|numeric',
             'service_location_id' => 'required',
             'description' => 'required',
@@ -180,6 +183,8 @@ class UserController extends Controller {
                 'business_name' => $request->business_name,
                 'category_id' => $request->category_id,
                 'address' => $request->address,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
                 'phone' => $request->phone,
                 'service_location_id' => $request->service_location_id,
                 'description' => $request->description,
@@ -236,6 +241,15 @@ class UserController extends Controller {
             return $this->error([], 'Days not found', 404);
         }
         return $this->success($days, 'Days fetched successfully', 200);
+    }
+
+    public function getLocation()
+    {
+        $data = ServiceLocation::all();
+        if (!$data) {
+            return $this->error([], 'Locations not found', 404);
+        }
+        return $this->success($data, 'Locations fetched successfully', 200);
     }
 
 }
