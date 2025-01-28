@@ -3,7 +3,7 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use App\Models\Subcategory;
-use App\Repositories\Contracts\CategoryRepositoryInterface;
+use App\Interface\CategoryRepositoryInterface;
 
 class CategoryRepository implements CategoryRepositoryInterface
 {
