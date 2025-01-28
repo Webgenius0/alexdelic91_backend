@@ -26,5 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ServiceProviderSubcategorySeeder::class);
         $this->call(ServiceProviderImagesSeeder::class);
         $this->call(ServiceProviderWorkDaysSeeder::class);
+        $this->call(BookingSeeder::class);
+        $this->call(FeedbackSeeder::class);
     }
 }
