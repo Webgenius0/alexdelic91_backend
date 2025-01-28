@@ -22,5 +22,9 @@ class DatabaseSeeder extends Seeder
         $this->call(ServiceLocationSeeder::class);
         $this->call(SubcategorySeeder::class);
         $this->call(DaysTableSeeder::class);
+        $this->call(ServiceProviderProfileSeeder::class);
+        $this->call(ServiceProviderSubcategorySeeder::class);
+        $this->call(ServiceProviderImagesSeeder::class);
+        $this->call(ServiceProviderWorkDaysSeeder::class);
     }
 }
