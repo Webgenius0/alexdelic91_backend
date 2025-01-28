@@ -17,6 +17,9 @@ class BookingProviderController extends Controller
         $this->bookingProviderInterface = $bookingProviderInterface;
     }
 
-
+    public function book(Request $request)
+    {
+        return $this->bookingProviderInterface->book($request);
+    }
 
 }

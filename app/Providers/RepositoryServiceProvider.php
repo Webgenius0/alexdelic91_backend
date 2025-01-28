@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Interface\BookingProviderInterface;
 use Illuminate\Support\ServiceProvider;
-use App\Interface\CategoryRepositoryInterface;
+use App\Interface\CategoryInterface;
+use App\Interface\ServiceProdiversInterface;
 use App\Repositories\BookingProviderRepository;
 use App\Repositories\CategoryRepository;
+use App\Repositories\ServiceProviersRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -15,7 +17,8 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
+        $this->app->bind(CategoryInterface::class, CategoryRepository::class);
+        $this->app->bind(ServiceProdiversInterface::class, ServiceProviersRepository::class);
         $this->app->bind(BookingProviderInterface::class, BookingProviderRepository::class);
     }
 

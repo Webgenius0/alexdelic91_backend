@@ -94,7 +94,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::controller(ProviderController::class)->group(function() {
-        Route::get('/all-providers','allProviders');
+        Route::get('/providers','providers');
+        Route::get('/provider-details/{id}','providerDetails');
     });
 });
 
