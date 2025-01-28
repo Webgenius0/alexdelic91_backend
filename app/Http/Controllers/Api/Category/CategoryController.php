@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 class CategoryController extends Controller
 {
     use ApiResponse;
+    
     public $categories;
 
     private $categoryRepository;

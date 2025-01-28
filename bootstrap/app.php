@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Middleware\Admin;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\JWTMiddleware;
+use Illuminate\Foundation\Application;
+use App\Http\Middleware\CustomerMiddleware;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\ServiceProviderMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/mizan_api.php'));
 
             Route::middleware(['web', 'auth', 'admin'])
                 ->prefix('admin')
@@ -37,6 +43,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'jwt.verify' => JWTMiddleware::class,
             'admin' => Admin::class,
+            'customer' => CustomerMiddleware::class,
+            'service_provider' => ServiceProviderMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

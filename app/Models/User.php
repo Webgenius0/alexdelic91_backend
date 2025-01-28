@@ -1,22 +1,18 @@
 <?php
-
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
-      /**
+    /**
      * Get the identifier that will be stored in the JWT subject claim.
      *
      * @return mixed
@@ -60,18 +56,39 @@ class User extends Authenticatable implements JWTSubject
      * @var array<string, string>
      */
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'email_verified_at' => 'datetime',
-            'agree_to_terms' => 'boolean',
-            'is_premium' => 'boolean',
-            'id' => 'integer',
+            'agree_to_terms'    => 'boolean',
+            'is_premium'        => 'boolean',
+            'id'                => 'integer',
         ];
     }
 
     public function serviceProviderProfile()
     {
         return $this->hasOne(ServiceProviderProfile::class);
+    }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class, 'user_id');
+    }
+
+    public function serviceProviderBookmarks()
+    {
+        return $this->hasMany(Bookmark::class, 'service_provider_id');
+    }
+
+    public function feedbacksGiven()
+    {
+        return $this->hasMany(Feedback::class, 'user_id');
+    }
+
+    public function feedbacksReceived()
+    {
+        return $this->hasMany(Feedback::class, 'service_provider_id');
     }
 
 }

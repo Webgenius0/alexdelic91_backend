@@ -63,6 +63,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
         Route::post('/service/provider/profile/create','create');
         Route::get('/days', 'getDays');
+        Route::get('/service/location', 'getLocation');
     });
 
 });
