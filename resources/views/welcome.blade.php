@@ -142,7 +142,6 @@
             </a>
         </p>
     </div> --}}
-    fff
     <div>
         @if (Route::has('login'))
             @auth

@@ -49,10 +49,7 @@ class DynamicPageController extends Controller {
                 ->addColumn('action', function ($data) {
                     return ' <a href="' . route('dynamic_page.edit', ['id' => $data->id]) . '" type="button" class="btn btn-success text-white btn-sm" title="Edit">
                               <i class="bi bi-pencil"></i>
-                              </a> '
-                        . ' <a href="javascript:void(0)" onclick="showDeleteConfirm(' . $data->id . ')" type="button" class="btn btn-danger text-white btn-sm" title="Delete">
-                              <i class="bi bi-trash"></i>
-                              </a>';
+                              </a> ';
                 })
                 ->rawColumns(['page_content', 'status', 'action'])
                 ->make();
@@ -60,47 +57,8 @@ class DynamicPageController extends Controller {
         return view('backend.layouts.settings.dynamic_page.index');
     }
 
-    /**
-     * Show the form for creating a new dynamic page.
-     *
-     * @return View|RedirectResponse
-     */
-    public function create(): View | RedirectResponse {
-        if (User::find(auth()->user()->id)) {
-            return view('backend.layouts.settings.dynamic_page.create');
-        }
-        return redirect()->route('dynamic_page.index');
-    }
 
-    /**
-     * Store a newly created dynamic page in the database.
-     *
-     * @param Request $request
-     * @return RedirectResponse
-     */
-    public function store(Request $request): RedirectResponse {
-        try {
-            if (User::find(auth()->user()->id)) {
-                $validator = Validator::make($request->all(), [
-                    'page_title'   => 'required|string',
-                    'page_content' => 'required|string',
-                ]);
 
-                if ($validator->fails()) {
-                    return redirect()->back()->withErrors($validator)->withInput();
-                }
-
-                $data               = new DynamicPage();
-                $data->page_title   = $request->page_title;
-                $data->page_slug    = Str::slug($request->page_title);
-                $data->page_content = $request->page_content;
-                $data->save();
-            }
-            return redirect()->route('dynamic_page.index')->with('t-success', 'Dynamic Page created successfully.');
-        } catch (Exception) {
-            return redirect()->route('dynamic_page.index')->with('t-error', 'Dynamic Page failed created.');
-        }
-    }
 
     /**
      * Show the form for editing the specified dynamic page.
@@ -179,18 +137,4 @@ class DynamicPageController extends Controller {
         }
     }
 
-    /**
-     * Remove the specified dynamic page from the database.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function destroy(int $id): JsonResponse {
-        $page = DynamicPage::findOrFail($id);
-        $page->delete();
-        return response()->json([
-            't-success' => true,
-            'message'   => 'Deleted successfully.',
-        ]);
-    }
 }
