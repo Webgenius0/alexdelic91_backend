@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
-
-use App\Models\Category;
+namespace App\Interface;
 
 interface CategoryRepositoryInterface
 {
