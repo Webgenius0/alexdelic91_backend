@@ -21,12 +21,18 @@ class BookingRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'service_provider_id' => 'required|exists:users,id',
+        $rules = [
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'booking_date' => 'required|date',
             'notes' => 'nullable|string',
         ];
+
+        // Only apply service_provider_id validation rule on CREATE (POST method)
+        if ($this->isMethod('post')) {
+            $rules['service_provider_id'] = 'required|exists:users,id';
+        }
+
+        return $rules;
     }
 }
