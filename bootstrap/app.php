@@ -31,6 +31,9 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/rhishi_api.php'));
+            Route::middleware('api', 'jwt.verify')
+                ->prefix('api')
+                ->group(base_path('routes/chat.php'));
 
             Route::middleware(['web', 'auth', 'admin'])
                 ->prefix('admin')
