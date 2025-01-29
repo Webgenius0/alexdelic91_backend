@@ -80,5 +80,10 @@ class Booking extends Model
     {
         return $this->hasMany(Feedback::class);
     }
+
+    public function bookingDetails()
+    {
+        return $this->belongsTo(ServiceProviderProfile::class,'service_provider_id');
+    }
     
 }

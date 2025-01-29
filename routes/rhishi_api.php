@@ -25,6 +25,10 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     Route::controller(BookingProviderController::class)->prefix('booking')->group(function () {
         Route::post('/create', 'book');
+        Route::get('/get/past', 'pastBookings');
+        Route::get('/get/upcoming', 'upcomingBookings');
+        Route::get('/get/single/{id}', 'single');
+        Route::put('/edit/{id}', 'edit');
     });
 
 });

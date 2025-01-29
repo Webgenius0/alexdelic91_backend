@@ -15,12 +15,43 @@ class ServiceProviderRepository implements ServiceProviderInterface
         //
     }
 
-    public function providers() {
-        return ServiceProviderProfile::with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage'])->get();
-    }
+    public function providers(array $queryParams) {
+        
+        $data = ServiceProviderProfile::query()->with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime','category.subCategories','booking.feedbacks']);
+    
+        if ($queryParams == []) {
+            return $data->get();  
+        }
+        if (!empty($queryParams['business_name'])) {
+            $data = $data->where('business_name', 'like', '%' . $queryParams['business_name'] . '%');
+        }
+    
+        if (!empty($queryParams['latitude']) && !empty($queryParams['longitude'] && !empty($queryParams['radius']))) {
+            $data = $data->selectRaw("*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance", [$queryParams['latitude'], $queryParams['longitude'], $queryParams['latitude']])->having('distance', '<', $queryParams['radius']);
+           
+        }
 
-    public function providerDetails($id)  {
-        return ServiceProviderProfile::with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage'])->findOrFail($id);
+        if(!empty($queryParams['category_id'])) {
+            $data = $data->where('category_id', $queryParams['category_id']);
+        }
+
+        if(!empty($queryParams['subcategory_id'])) {
+            $data = $data->where('subcategory_id', $queryParams['subcategory_id']);
+
+        }
+
+    if (!empty($queryParams['avg_rating'])) {
+        $data = $data->withAvg('booking.feedbacks', 'rating');
+        
+        $data = $data->having('booking_feedbacks_avg_rating', '>=', $queryParams['avg_rating']);  
+    }
+            
+        return $data->get(); 
+    }
+    
+
+    public function getProviderDetails($id)  {
+        return ServiceProviderProfile::with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime'])->findOrFail($id);
     }
 
 }
