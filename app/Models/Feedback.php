@@ -33,4 +33,6 @@ public function serviceProvider()
     {
         return $this->belongsTo(Booking::class);
     }
+
+    
 }
