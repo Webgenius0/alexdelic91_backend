@@ -30,11 +30,13 @@ class UserController extends Controller {
 
         $user = auth()->user();
 
-        if (!$user) {
+        $data = User::with('serviceProviderProfile.serviceProviderImage')->where('id', $user->id)->first();
+
+        if (!$data) {
             return $this->error([], 'User Not Found', 404);
         }
 
-        return $this->success($user, 'User data fetched successfully', 200);
+        return $this->success($data, 'User data fetched successfully', 200);
     }
 
     /**

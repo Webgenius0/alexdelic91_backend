@@ -27,6 +27,10 @@ return new class extends Migration
             $table->string('zip_code', 20)->nullable();
             $table->string('start_time', 100)->nullable();
             $table->string('end_time', 100)->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('tiktok')->nullable();
+            $table->string('website')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps(); 
         });
