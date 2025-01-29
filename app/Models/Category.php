@@ -22,4 +22,9 @@ class Category extends Model
     {
         return $this->hasMany(SubCategory::class);
     }
+
+    public function serviceProviderProfiles()
+    {
+        return $this->belongsToMany(ServiceProviderProfile::class, 'service_provider_profile_categories', 'category_id', 'service_provider_profile_id');
+    }
 }

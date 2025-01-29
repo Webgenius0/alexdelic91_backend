@@ -10,7 +10,7 @@ class BookMark extends Model
     protected $casts = [
         'id'                  => 'integer',
         'user_id'             => 'integer',
-        'booking_id' => 'integer',
+        'service_provider_id' => 'integer',
     ];
 
     protected $hidden = [
@@ -23,5 +23,8 @@ class BookMark extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function 
+    public function serviceProvider()
+    {
+        return $this->belongsTo(User::class, 'service_provider_id');
+    }
 }

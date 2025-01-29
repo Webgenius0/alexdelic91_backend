@@ -24,8 +24,15 @@ class Feedback extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+public function serviceProvider()
+    {
+        return $this->belongsTo(User::class, 'service_provider_id');
+    }
+
     public function booking()
     {
         return $this->belongsTo(Booking::class);
     }
+
+    
 }
