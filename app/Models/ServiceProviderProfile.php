@@ -46,5 +46,10 @@ class ServiceProviderProfile extends Model
         return $this->hasMany(ServiceProviderImage::class, 'service_provider_id');
     }
 
+    public function booking()
+    {
+        return $this->hasMany(Booking::class, 'service_provider_id');
+    }
+
     
 }
