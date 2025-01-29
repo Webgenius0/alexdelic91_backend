@@ -59,11 +59,26 @@ class User extends Authenticatable implements JWTSubject
     protected function casts(): array
     {
         return [
+            'start_time' => 'datetime:H:i',
+            'end_time' => 'datetime:H:i',
             'email_verified_at' => 'datetime',
             'agree_to_terms'    => 'boolean',
             'is_premium'        => 'boolean',
             'id'                => 'integer',
         ];
+    }
+
+    public function isAvailableForBooking($start_time, $end_time)
+    {
+        // Ensure the provider has a serviceProviderProfile
+        if (!$this->serviceProviderProfile) {
+            return false;
+        }
+
+        $available_from = $this->serviceProviderProfile->start_time;
+        $available_to = $this->serviceProviderProfile->end_time;
+
+        return $start_time >= $available_from && $end_time <= $available_to;
     }
 
     public function serviceProviderProfile()
