@@ -3,30 +3,30 @@
 namespace App\Http\Controllers\Api\Provider;
 
 use App\Http\Controllers\Controller;
-use App\Interface\ServiceProdiversInterface;
+use App\Interface\ServiceProviderInterface;
 use App\Traits\ApiResponse;
 
 class ProviderController extends Controller
 {
     use ApiResponse;
-    public $providers,$proivderDetails;
-    private $serviceProvidersRepository;
+    public $providers,$providerDetails;
+    private $serviceProviderRepository;
 
-    public function __construct(ServiceProdiversInterface $serviceProvidersRepository)
+    public function __construct(ServiceProviderInterface $serviceProvidersRepository)
     {
-        $this->serviceProvidersRepository = $serviceProvidersRepository;
+        $this->serviceProviderRepository = $serviceProvidersRepository;
     }
 
     public function providers() {
-        $providers = $this->serviceProvidersRepository->providers();
+        $providers = $this->serviceProviderRepository->providers();
 
         return $this->success($providers,'All providers are here',200);
 
     }
 
     public function providerDetails($id) {
-        $proivderDetails = $this->serviceProvidersRepository->providerDetails($id);
-        return $this->success($proivderDetails,'Provider details are here',200);
+        $providerDetails = $this->serviceProviderRepository->providerDetails($id);
+        return $this->success($providerDetails,'Provider details are here',200);
 
     }
 }

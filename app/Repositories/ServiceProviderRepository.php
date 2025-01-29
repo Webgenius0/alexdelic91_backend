@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Interface\ServiceProdiversInterface;
+use App\Interface\ServiceProviderInterface;
 use App\Models\ServiceProviderProfile;
 
-class ServiceProviersRepository implements ServiceProdiversInterface
+class ServiceProviderRepository implements ServiceProviderInterface
 {
     /**
      * Create a new class instance.

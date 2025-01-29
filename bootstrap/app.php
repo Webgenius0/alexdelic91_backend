@@ -21,7 +21,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
             Route::middleware('api')
                 ->prefix('api')
+                ->group(base_path('routes/rafi_api.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
                 ->group(base_path('routes/mizan_api.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/rhishi_api.php'));
 
             Route::middleware(['web', 'auth', 'admin'])
                 ->prefix('admin')
@@ -34,6 +42,10 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware(['web', 'auth', 'admin'])
                 ->prefix('admin')
                 ->group(base_path('routes/mizan_backend.php'));
+
+            Route::middleware(['web', 'auth', 'admin'])
+                ->prefix('admin')
+                ->group(base_path('routes/rhishi_backend.php'));
 
             Route::middleware(['web'])
                 ->group(base_path('routes/frontend.php'));
