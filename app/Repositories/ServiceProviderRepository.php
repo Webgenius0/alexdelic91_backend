@@ -16,12 +16,12 @@ class ServiceProviderRepository implements ServiceProviderInterface
     }
 
     public function providers(array $queryParams) {
-        $data = ServiceProviderProfile::query()->with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime','category.subCategories']);
+
+        $data = ServiceProviderProfile::query()->with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime','category.subCategories','booking.feedbacks']);
     
         if ($queryParams == []) {
             return $data->get();  
         }
-    
         if (!empty($queryParams['business_name'])) {
             $data = $data->where('business_name', 'like', '%' . $queryParams['business_name'] . '%');
         }
@@ -40,9 +40,11 @@ class ServiceProviderRepository implements ServiceProviderInterface
 
         }
 
-        if(!empty($queryParams['rating'])) {
-            $data = $data->where('rating', $queryParams['rating']);
-        }
+    if (!empty($queryParams['avg_rating'])) {
+        $data = $data->withAvg('booking.feedbacks', 'rating');
+        
+        $data = $data->having('booking_feedbacks_avg_rating', '>=', $queryParams['avg_rating']);  
+    }
             
         return $data->get(); 
     }
