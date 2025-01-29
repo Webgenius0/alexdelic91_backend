@@ -48,7 +48,7 @@ class BookMarkController extends Controller
             return $this->error([], "User Unauthorized", 401);
         }
 
-        $bookmarks = BookMark::with(['serviceProvider.ServiceProviderProfile.serviceProviderImage'])
+        $bookmarks = BookMark::with(['serviceProvider.ServiceProviderProfile.serviceProviderImage','serviceProvider.feedbacks'])
             ->where('user_id', $user->id)
             ->get();
 
