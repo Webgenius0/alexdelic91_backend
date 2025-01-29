@@ -78,7 +78,7 @@ class ServiceProviderController extends Controller
             'facebook' => 'nullable|string|url',
             'tiktok' => 'nullable|string|url',
             'website' => 'nullable|string|url',
-            'about' => 'nullable|string',
+            'description' => 'nullable|string',
             'avatar' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
             'images.*' => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
         ]);
@@ -113,27 +113,32 @@ class ServiceProviderController extends Controller
                 'avatar' => $user->avatar,
             ]);
 
-            $data = $user->serviceProviderProfile()->update([
-                'business_name' => $request->name,
+            $profile = $user->serviceProviderProfile()->updateOrCreate([], [
+                'business_name' => $user->name,
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'instagram' => $request->instagram,
                 'facebook' => $request->facebook,
                 'tiktok' => $request->tiktok,
                 'website' => $request->website,
-                'about' => $request->about
+                'description' => $request->description
             ]);
 
             // Handle gallery images
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
                     $imageName = uploadImage($image, 'service/images');
-                    ServiceProviderImage::create([
-                        'service_provider_id' => $data->id,
+                   $images = ServiceProviderImage::create([
+                        'service_provider_id' => $profile->id,
                         'images' => $imageName,
                     ]);
                 }
             }
+            $data = [
+                'user' => $user,
+                'profile' => $profile,
+            ];
+
             if ($data) {
                 return $this->success($data, 'Profile updated successfully', 200);
             }
