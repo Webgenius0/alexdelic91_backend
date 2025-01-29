@@ -40,6 +40,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $hidden = [
+        'agree_to_terms',
         'password',
         'remember_token',
         'email_verified_at',
@@ -86,16 +87,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(ServiceProviderProfile::class);
     }
 
-    public function bookmarks()
-    {
-        return $this->hasMany(Bookmark::class, 'user_id');
-    }
-
-    public function serviceProviderBookmarks()
-    {
-        return $this->hasMany(Bookmark::class, 'service_provider_id');
-    }
-
     public function feedbacks()
     {
         return $this->hasMany(Feedback::class);
@@ -124,5 +115,21 @@ class User extends Authenticatable implements JWTSubject
     public function providedServices()
     {
         return $this->hasMany(Booking::class, 'service_provider_id');
+    }
+
+    /**
+     * Relationship with BookMarks (A user can bookmark many service providers)
+     */
+    public function bookmarks()
+    {
+        return $this->hasMany(BookMark::class);
+    }
+
+    /**
+     * Relationship with BookMarks (A user can be bookmarked by many users)
+     */
+    public function bookmarkedBy()
+    {
+        return $this->hasMany(BookMark::class, 'service_provider_id');
     }
 }
