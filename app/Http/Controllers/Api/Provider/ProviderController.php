@@ -9,7 +9,7 @@ use App\Traits\ApiResponse;
 class ProviderController extends Controller
 {
     use ApiResponse;
-    public $providers,$providerDetails;
+    
     private $serviceProviderRepository;
 
     public function __construct(ServiceProviderInterface $serviceProvidersRepository)
@@ -25,7 +25,7 @@ class ProviderController extends Controller
     }
 
     public function providerDetails($id) {
-        $providerDetails = $this->serviceProviderRepository->providerDetails($id);
+        $providerDetails = $this->serviceProviderRepository->getProviderDetails($id);
         return $this->success($providerDetails,'Provider details are here',200);
 
     }

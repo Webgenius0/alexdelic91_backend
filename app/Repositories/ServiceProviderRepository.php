@@ -16,11 +16,11 @@ class ServiceProviderRepository implements ServiceProviderInterface
     }
 
     public function providers() {
-        return ServiceProviderProfile::with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage'])->get();
+        return ServiceProviderProfile::with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime'])->get();
     }
 
-    public function providerDetails($id)  {
-        return ServiceProviderProfile::with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage'])->findOrFail($id);
+    public function getProviderDetails($id)  {
+        return ServiceProviderProfile::with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime'])->findOrFail($id);
     }
 
 }
