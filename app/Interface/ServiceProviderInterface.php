@@ -5,5 +5,5 @@ namespace App\Interface;
 interface ServiceProviderInterface
 {
     public function providers();
-    public function providerDetails($id);
+    public function getProviderDetails($id);
 }
