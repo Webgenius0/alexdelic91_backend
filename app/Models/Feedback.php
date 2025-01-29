@@ -11,7 +11,7 @@ class Feedback extends Model
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
-        'service_provider_id' => 'integer',
+        'booking_id' => 'integer',
     ];
 
     protected $hidden = [
