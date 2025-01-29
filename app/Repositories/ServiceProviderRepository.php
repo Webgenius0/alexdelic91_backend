@@ -16,7 +16,7 @@ class ServiceProviderRepository implements ServiceProviderInterface
     }
 
     public function providers(array $queryParams) {
-
+        
         $data = ServiceProviderProfile::query()->with(['user','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime','category.subCategories','booking.feedbacks']);
     
         if ($queryParams == []) {
