@@ -2,7 +2,7 @@
 
 namespace App\Interface;
 
-interface ServiceProdiversInterface
+interface ServiceProviderInterface
 {
     public function providers();
     public function providerDetails($id);
