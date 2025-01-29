@@ -5,9 +5,7 @@ namespace App\Repositories;
 use App\Interface\BookingProviderInterface;
 use App\Models\Booking;
 use App\Models\User;
-use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
-use Illuminate\Support\Facades\Validator;
 
 class BookingProviderRepository implements BookingProviderInterface
 {

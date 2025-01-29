@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api\BookingProvider;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingRequest;
 use App\Interface\BookingProviderInterface;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiResponse;
 
 class BookingProviderController extends Controller
 {
+    use ApiResponse;
     private $bookingProviderInterface;
     /**
      * Create a new class instance.
