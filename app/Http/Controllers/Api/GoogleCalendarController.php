@@ -25,8 +25,9 @@ class GoogleCalendarController extends Controller
     // Redirect to Google OAuth
     public function redirectToGoogle()
     {
+       
         $client = $this->getGoogleClient();
-        return redirect($client->createAuthUrl());
+        return response()->json(['url' => $client->createAuthUrl()]);
     }
 
     // Handle OAuth Callback and Store Access Token
