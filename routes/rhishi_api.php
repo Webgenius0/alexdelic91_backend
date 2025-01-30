@@ -31,11 +31,13 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
         Route::get('/get/single/{id}', 'single');
         Route::get('/get/provider/single/{id}', 'providerSingle');
+        Route::get('/get/provider/rating/single/{id}', 'providerWithRatingSingle');
 
         Route::post('/cancel/{id}', 'cancel');
         Route::post('/booked/{id}', 'booked');
 
         Route::get('/get/provider', 'getProviderBookings');
+        Route::get('/get/provider/history', 'getProviderBookingsHistory');
     });
 
 });

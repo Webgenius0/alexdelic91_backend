@@ -13,4 +13,6 @@ interface BookingProviderInterface
     public function cancel($id);
     public function booked($id);
     public function getProviderBookings($date);
+    public function getProviderBookingsHistory();
+    public function providerWithRatingSingle($id);
 }

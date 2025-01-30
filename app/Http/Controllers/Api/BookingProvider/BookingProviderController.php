@@ -120,4 +120,26 @@ class BookingProviderController extends Controller
 
         return $this->success($bookings, 'Provider bookings fetched successfully', 200);
     }
+
+    public function getProviderBookingsHistory()
+    {
+        $bookings = $this->bookingProviderInterface->getProviderBookingsHistory();
+
+        if (!$bookings) {
+            return $this->error([], "An error occurred while fetching provider bookings history", 500);
+        }
+
+        return $this->success($bookings, 'Provider bookings history fetched successfully', 200);
+    }
+
+    public function providerWithRatingSingle($id)
+    {
+        $booking = $this->bookingProviderInterface->providerWithRatingSingle($id);
+
+        if (!$booking) {
+            return $this->error([], "An error occurred while fetching the booking", 500);
+        }
+
+        return $this->success($booking, 'Booking fetched successfully', 200);
+    }
 }
