@@ -40,11 +40,11 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     // Google Calendar
 
     Route::controller(GoogleCalendarController::class)->group(function() {
-        Route::get('google-calendar/redirect', 'redirectToGoogle');
-        Route::get('google-calendar/callback', 'handleGoogleCallback');
-        Route::post('google-calendar/sync', 'syncEvents');
+        Route::get('google-auth', 'redirectToGoogle');
+        Route::get('google-callback', 'handleGoogleCallback');
+        Route::post('sync-calendar', 'addBookingToCalendar');
         });
-
+       
 });
 
 
