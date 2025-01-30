@@ -20,9 +20,10 @@ return new class extends Migration
             $table->string('location');
             $table->string('latitude', 255)->nullable();
             $table->string('longitude', 255)->nullable();
-            $table->time('available_time')->nullable();
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
             $table->text('notes')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['completed','pending','cancelled','booked','blocked'])->default('pending');
             $table->timestamps();
         });
     }

@@ -13,11 +13,11 @@ class JobPost extends Model
         'user_id'             => 'integer',
         'category_id' => 'integer',
         'subcategory_id' => 'integer',
-        'available_time'      => 'datetime:H:i',
+        'start_time'      => 'datetime:H:i',
+        'end_time'      => 'datetime:H:i',
     ];
 
     protected $hidden = [
-        'status',
         'created_at',
         'updated_at',
     ];
