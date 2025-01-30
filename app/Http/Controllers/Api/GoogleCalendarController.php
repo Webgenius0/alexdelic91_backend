@@ -3,97 +3,70 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Google\Client as GoogleClient;
+use Google\Client;
 use Google\Service\Calendar;
-use Google\Service\Calendar\Event;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class GoogleCalendarController extends Controller
 {
-    private $client;
-
-    public function __construct()
+    private function getGoogleClient()
     {
-        $this->client = new GoogleClient();
-        $this->client->setAuthConfig(storage_path('app/google-calendar/credentials.json'));
-        $this->client->addScope(Calendar::CALENDAR);
-        $this->client->setRedirectUri(route('google-calendar/callback'));
-        $this->client->setAccessType('offline');
-        $this->client->setPrompt('select_account consent');
+        $client = new Client();
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $client->addScope(Calendar::CALENDAR_EVENTS);
+        $client->setAccessType('offline');
+
+        return $client;
     }
 
     // Redirect to Google OAuth
     public function redirectToGoogle()
     {
-        $authUrl = $this->client->createAuthUrl();
-        return response()->json(['auth_url' => $authUrl]);
+        $client = $this->getGoogleClient();
+        return redirect($client->createAuthUrl());
     }
 
-    // Handle Google OAuth callback
+    // Handle OAuth Callback and Store Access Token
     public function handleGoogleCallback(Request $request)
     {
-        $code = $request->get('code');
-        $token = $this->client->fetchAccessTokenWithAuthCode($code);
+        $client = $this->getGoogleClient();
+        $token = $client->fetchAccessTokenWithAuthCode($request->input('code'));
 
         if (isset($token['error'])) {
-            return response()->json(['error' => 'Failed to authenticate with Google.'], 400);
+            return response()->json(['error' => $token['error']], 400);
         }
 
-        // Save the token to the database
-        Auth::user()->update(['google_calendar_token' => json_encode($token)]);
-
-        return response()->json(['success' => 'Successfully authenticated with Google.']);
+        Session::put('google_access_token', $token['access_token']);
+        return response()->json(['message' => 'Authenticated successfully', 'access_token' => $token['access_token']]);
     }
 
-    // Sync events with Google Calendar
-    public function syncEvents(Request $request)
+    // Add Booking to Google Calendar
+    public function addBookingToCalendar(Request $request)
     {
-        $user = Auth::user();
-        $token = json_decode($user->google_calendar_token, true);
+        $request->validate([
+            'access_token' => 'required',
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date',
+        ]);
 
-        if (!$token) {
-            return response()->json(['error' => 'User not authenticated with Google.'], 401);
-        }
+        $client = $this->getGoogleClient();
+        $client->setAccessToken($request->access_token);
+        $calendarService = new Calendar($client);
 
-        $this->client->setAccessToken($token);
+        $event = new Calendar\Event([
+            'summary' => $request->title,
+            'description' => $request->description,
+            'start' => ['dateTime' => $request->start_time, 'timeZone' => 'Asia/Dhaka'],
+            'end' => ['dateTime' => $request->end_time, 'timeZone' => 'Asia/Dhaka'],
+        ]);
 
-        if ($this->client->isAccessTokenExpired()) {
-            $refreshToken = $this->client->getRefreshToken();
-            $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
-            $newToken = $this->client->getAccessToken();
-            Auth::user()->update(['google_calendar_token' => json_encode($newToken)]);
-        }
+        $calendarService->events->insert('primary', $event);
 
-        // Fetch bookings from your existing API
-        $bookings = $this->getUserBookings($user->email);
-
-        // Sync bookings to Google Calendar
-        $service = new Calendar($this->client);
-        foreach ($bookings as $booking) {
-            $event = new Event([
-                'summary' => $booking['service_name'],
-                'start' => ['dateTime' => $booking['start_time'], 'timeZone' => 'UTC'],
-                'end' => ['dateTime' => $booking['end_time'], 'timeZone' => 'UTC'],
-            ]);
-
-            $service->events->insert('primary', $event);
-        }
-
-        return response()->json(['success' => 'Events synced successfully.']);
+        return response()->json(['message' => 'Event added to Google Calendar']);
     }
-
-    // Fetch bookings from your existing API
-    private function getUserBookings($email)
-    {
-        // Call your existing API to fetch bookings
-        return [
-            [
-                'service_name' => 'Booking 1',
-                'start_time' => '2023-10-15T09:00:00Z',
-                'end_time' => '2023-10-15T10:00:00Z',
-            ],
-        ];
-    }
-
 }
