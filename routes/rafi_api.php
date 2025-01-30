@@ -48,5 +48,10 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 });
 
 
+Route::controller(GoogleCalendarController::class)->group(function() {
+    Route::get('google-callback', 'handleGoogleCallback');
+    });
+
+
 
 
