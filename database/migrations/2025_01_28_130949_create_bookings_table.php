@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('latitude');
             $table->string('longitude');
             $table->text('notes')->nullable();
-            $table->enum('status', ['pending', 'booked', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'booked', 'completed', 'cancelled', 'deleted'])->default('pending');
             $table->timestamps();
         });
     }
