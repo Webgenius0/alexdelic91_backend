@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BookingRequest extends FormRequest
+class JobPostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,20 +21,18 @@ class BookingRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'booking_date' => 'required|date',
-            'address' => 'required|string',
+        return [
+            'title' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'location' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'notes' => 'nullable|string',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i|after:start_time',
+            'date.*' => 'nullable|date',
         ];
-
-        // Only apply service_provider_id validation rule on CREATE (POST method)
-        if ($this->isMethod('post')) {
-            $rules['service_provider_id'] = 'required|exists:users,id';
-        }
 
         return $rules;
     }

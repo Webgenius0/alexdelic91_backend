@@ -20,6 +20,9 @@ class Booking extends Model
         'start_time',
         'end_time',
         'booking_date',
+        'address',
+        'latitude',
+        'longitude',
         'notes',
         'status',
     ];
@@ -46,6 +49,8 @@ class Booking extends Model
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
         'booking_date' => 'date:Y-m-d',
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function overlaps($start_time, $end_time, $booking_date)
@@ -81,9 +86,14 @@ class Booking extends Model
         return $this->hasMany(Feedback::class);
     }
 
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class);
+    }
+
     public function bookingDetails()
     {
         return $this->belongsTo(ServiceProviderProfile::class,'service_provider_id');
     }
-    
+
 }

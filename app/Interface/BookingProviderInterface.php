@@ -8,5 +8,11 @@ interface BookingProviderInterface
     public function pastBookings();
     public function upcomingBookings();
     public function single($id);
+    public function providerSingle($id);
     public function edit($data, $id);
+    public function cancel($id);
+    public function booked($id);
+    public function getProviderBookings($date);
+    public function getProviderBookingsHistory();
+    public function providerWithRatingSingle($id);
 }
