@@ -15,7 +15,6 @@ class Feedback extends Model
     ];
 
     protected $hidden = [
-        'created_at',
         'updated_at',
     ];
 
@@ -34,5 +33,5 @@ public function serviceProvider()
         return $this->belongsTo(Booking::class);
     }
 
-    
+
 }

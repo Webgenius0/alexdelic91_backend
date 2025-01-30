@@ -2,10 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\CustomException;
 use App\Interface\BookingProviderInterface;
 use App\Models\Booking;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use Illuminate\Support\Facades\Log;
+use Pest\ArchPresets\Custom;
 
 class BookingProviderRepository implements BookingProviderInterface
 {
@@ -32,13 +35,13 @@ class BookingProviderRepository implements BookingProviderInterface
 
         // Check if booking is within the provider's available hours
         if (!$provider->isAvailableForBooking($data['start_time'], $data['end_time'])) {
-            return $this->error([], "This provider is only available from {$provider->serviceProviderProfile->start_time} to {$provider->serviceProviderProfile->end_time}", 409);
+            throw new CustomException("This provider is only available from {$provider->serviceProviderProfile->start_time} to {$provider->serviceProviderProfile->end_time}", 409);
         }
 
         $booking = new Booking();
 
         if ($booking->overlaps($data['start_time'], $data['end_time'], $data['booking_date'])) {
-            return $this->error([], "Booking overlaps with another booking", 409);
+            throw new CustomException("Booking overlaps with another booking", 409);
         }
 
         try {
@@ -49,12 +52,15 @@ class BookingProviderRepository implements BookingProviderInterface
                 'start_time' => $data['start_time'],
                 'end_time' => $data['end_time'],
                 'booking_date' => $data['booking_date'],
+                'address' => $data['address'],
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'],
                 'notes' => $data['notes'],
             ]);
 
             return $booking;
         } catch (\Exception $e) {
-            return null;
+            return $e->getMessage();
         }
     }
 
@@ -66,7 +72,12 @@ class BookingProviderRepository implements BookingProviderInterface
             return $this->error([], "User Not Found", 404);
         }
 
-        $bookings = Booking::where('user_id', $user->id)
+        $bookings = Booking::with([
+                'serviceProvider:id,name,avatar',
+                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+                'serviceProvider.serviceProviderProfile.category:id,category_name'
+            ])
+            ->where('user_id', $user->id)
             ->whereDate('booking_date', '<', now())
             ->get();
 
@@ -81,7 +92,12 @@ class BookingProviderRepository implements BookingProviderInterface
             return $this->error([], "User Not Found", 404);
         }
 
-        $bookings = Booking::where('user_id', $user->id)
+        $bookings = Booking::with([
+                'serviceProvider:id,name,avatar',
+                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+                'serviceProvider.serviceProviderProfile.category:id,category_name'
+            ])
+            ->where('user_id', $user->id)
             ->whereDate('booking_date', '>=', now())
             ->get();
 
@@ -96,7 +112,33 @@ class BookingProviderRepository implements BookingProviderInterface
             return $this->error([], "User Not Found", 404);
         }
 
-        $booking = Booking::where('user_id', $user->id)
+        $booking = Booking::with([
+                'serviceProvider:id,name,avatar',
+                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+                'serviceProvider.serviceProviderProfile.category:id,category_name'
+            ])
+            ->where('user_id', $user->id)
+            ->where('id', $id)
+            ->first();
+
+        return $booking;
+    }
+
+    public function providerSingle($id)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return $this->error([], "User Not Found", 404);
+        }
+
+        $booking = Booking::with([
+                'user:id,name,avatar',
+                'serviceProvider:id',
+                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+                'serviceProvider.serviceProviderProfile.category:id,category_name'
+            ])
+            ->where('service_provider_id', $user->id)
             ->where('id', $id)
             ->first();
 
@@ -124,6 +166,9 @@ class BookingProviderRepository implements BookingProviderInterface
                 'start_time' => $data['start_time'],
                 'end_time' => $data['end_time'],
                 'booking_date' => $data['booking_date'],
+                'address' => $data['address'],
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'],
                 'notes' => $data['notes'],
             ]);
 
@@ -131,5 +176,139 @@ class BookingProviderRepository implements BookingProviderInterface
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function cancel($id)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return $this->error([], "User Not Found", 404);
+        }
+
+        $booking = Booking::where('user_id', $user->id)
+            ->where('id', $id)
+            ->first();
+
+        if (!$booking) {
+            return $this->error([], "Booking Not Found", 404);
+        }
+
+        try {
+            $booking->status = 'cancelled';
+            $booking->save();
+
+            return $this->success([], "Booking canceled successfully", 200);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function booked($id)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return $this->error([], "User Not Found", 404);
+        }
+
+        $booking = Booking::where('user_id', $user->id)
+            ->where('id', $id)
+            ->first();
+
+        if (!$booking) {
+            return $this->error([], "Booking Not Found", 404);
+        }
+
+        try {
+            $booking->status = 'booked';
+            $booking->save();
+
+            return $this->success([], "Booking booked successfully", 200);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function getProviderBookings($date)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return $this->error([], "User Not Found", 404);
+        }
+
+        $query = Booking::with([
+                'user:id,name,avatar',
+                'serviceProvider:id',
+                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+                'serviceProvider.serviceProviderProfile.category:id,category_name'
+            ])
+            ->where('service_provider_id', $user->id)
+            ->whereNot('status', 'deleted');
+
+
+        if ($date) {
+            $query->whereDate('booking_date', $date);
+        }
+
+        $bookings = $query->get();
+
+        return $bookings;
+    }
+
+    public function getProviderBookingsHistory()
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return $this->error([], "User Not Found", 404);
+        }
+
+        $bookings = Booking::with([
+                'user:id,name,avatar',
+                'serviceProvider:id',
+                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+                'serviceProvider.serviceProviderProfile.category:id,category_name'
+            ])
+            ->where('service_provider_id', $user->id)
+            ->whereDate('booking_date', '<', now())
+            ->whereNot('status', 'deleted')
+            ->get();
+
+        return $bookings;
+    }
+
+    public function providerWithRatingSingle($id)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return $this->error([], "User Not Found", 404);
+        }
+
+        try {
+            $booking = Booking::with([
+                    'user:id,name,avatar',
+                    'serviceProvider:id',
+                    'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+                    'serviceProvider.serviceProviderProfile.category:id,category_name',
+                    'feedback'
+                ])
+                ->where('service_provider_id', $user->id)
+                ->where('id', $id)
+                ->first();
+
+            if (!$booking) {
+                return $this->error([], "Booking Not Found", 404);
+            }
+
+            return $booking;
+        } catch (\Exception $e) {
+
+            return $e->getMessage();
+        }
+
+        return $booking;
     }
 }

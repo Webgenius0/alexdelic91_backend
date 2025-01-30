@@ -14,6 +14,8 @@ class ServiceProviderProfile extends Model
         'service_type_id' => 'integer',
         'service_location_id' => 'integer',
         'profile_completed' => 'boolean',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
     ];
 
     protected $hidden = [
