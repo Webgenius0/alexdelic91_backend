@@ -18,8 +18,11 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->date('booking_date');
+            $table->string('address');
+            $table->string('latitude');
+            $table->string('longitude');
             $table->text('notes')->nullable();
-            $table->enum('status', ['pending', 'accepted', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'booked', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }
