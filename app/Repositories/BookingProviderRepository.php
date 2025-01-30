@@ -2,11 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\CustomException;
 use App\Interface\BookingProviderInterface;
 use App\Models\Booking;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Log;
+use Pest\ArchPresets\Custom;
 
 class BookingProviderRepository implements BookingProviderInterface
 {
@@ -33,13 +35,13 @@ class BookingProviderRepository implements BookingProviderInterface
 
         // Check if booking is within the provider's available hours
         if (!$provider->isAvailableForBooking($data['start_time'], $data['end_time'])) {
-            return $this->error([], "This provider is only available from {$provider->serviceProviderProfile->start_time} to {$provider->serviceProviderProfile->end_time}", 409);
+            throw new CustomException("This provider is only available from {$provider->serviceProviderProfile->start_time} to {$provider->serviceProviderProfile->end_time}", 409);
         }
 
         $booking = new Booking();
 
         if ($booking->overlaps($data['start_time'], $data['end_time'], $data['booking_date'])) {
-            return $this->error([], "Booking overlaps with another booking", 409);
+            throw new CustomException("Booking overlaps with another booking", 409);
         }
 
         try {
@@ -58,8 +60,7 @@ class BookingProviderRepository implements BookingProviderInterface
 
             return $booking;
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return null;
+            return $e->getMessage();
         }
     }
 
