@@ -104,7 +104,7 @@ class RegisterController extends Controller {
                 'is_service_provider_info' => $flags
             ]);
 
-            return $this->success($data, 'Verification email sent', 201);
+            return $this->success($data, 'User registered successfully', 201);
         } catch (\Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }
