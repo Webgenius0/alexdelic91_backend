@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Category\CategoryController;
+use App\Http\Controllers\Api\GoogleCalendarController;
 use App\Http\Controllers\Api\HelpCenter\HelpCenterController;
 use App\Http\Controllers\Api\Provider\ProviderController;
 use App\Http\Controllers\Api\ReviewsController;
@@ -35,6 +36,14 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::get('/reviews','reviews');
        
     });
+
+    // Google Calendar
+
+    Route::controller(GoogleCalendarController::class)->group(function() {
+        Route::get('google-calendar/redirect', 'redirectToGoogle');
+        Route::get('google-calendar/callback', 'handleGoogleCallback');
+        Route::post('google-calendar/sync', 'syncEvents');
+        });
 
 });
 
