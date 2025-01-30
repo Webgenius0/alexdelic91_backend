@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingRequest;
 use App\Interface\BookingProviderInterface;
 use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 
 class BookingProviderController extends Controller
 {
@@ -65,6 +66,17 @@ class BookingProviderController extends Controller
         return $this->success($booking, 'Booking fetched successfully', 200);
     }
 
+    public function providerSingle($id)
+    {
+        $booking = $this->bookingProviderInterface->providerSingle($id);
+
+        if (!$booking) {
+            return $this->error([], "An error occurred while fetching the booking", 500);
+        }
+
+        return $this->success($booking, 'Booking fetched successfully', 200);
+    }
+
     public function edit(BookingRequest $request, $id)
     {
         $booking = $this->bookingProviderInterface->edit($request->validated(), $id);
@@ -76,4 +88,36 @@ class BookingProviderController extends Controller
         return $this->success($booking, 'Booking updated successfully', 200);
     }
 
+    public function cancel($id)
+    {
+        $booking = $this->bookingProviderInterface->cancel($id);
+
+        if (!$booking) {
+            return $this->error([], "An error occurred while cancelling the booking", 500);
+        }
+
+        return $this->success($booking, 'Booking cancelled successfully', 200);
+    }
+
+    public function booked($id)
+    {
+        $booking = $this->bookingProviderInterface->booked($id);
+
+        if (!$booking) {
+            return $this->error([], "An error occurred while fetching the booking", 500);
+        }
+
+        return $this->success($booking, 'Booking fetched successfully', 200);
+    }
+
+    public function getProviderBookings(Request $request)
+    {
+        $bookings = $this->bookingProviderInterface->getProviderBookings($request->date);
+
+        if (!$bookings) {
+            return $this->error([], "An error occurred while fetching provider bookings", 500);
+        }
+
+        return $this->success($bookings, 'Provider bookings fetched successfully', 200);
+    }
 }
