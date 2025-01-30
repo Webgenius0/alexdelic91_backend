@@ -8,7 +8,6 @@
     <meta name="keywords" content="Rhishi Kesh, Rhishi Kesh Bhowmik, RKB, RRR">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="google-site-verification" content="BwfU-omlQdLlg7EjHK37tzCP5W9rGGwwONErae5JoiA" />
     <link rel="icon" href="{{ asset($systemSetting->favicon ?? 'frontend/images/logo.svg') }}">
     @include('backend.partials.style')
 </head>
