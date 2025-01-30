@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Job\JobPostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\BookMarkController;
 use App\Http\Controllers\Api\User\FeedBackController;
@@ -18,6 +19,16 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::controller(FeedBackController::class)->group(function () {
             Route::post('/feedback/{id}', 'store');
             Route::get('/feedback', 'getFeedback');
+        });
+
+        //job post route--------
+        Route::controller(JobPostController::class)->group(function () {
+            Route::post('/job-post', 'jobPost');
+            Route::get('/job-post/past', 'pastJobPost');
+            Route::get('/job-post/upcoming', 'upcomingJobPost');
+
+            Route::get('/job-post/{id}', 'jobPostDetails');
+            route::post('/rejob-post/{id}', 'reJobPost');
         });
 
     });

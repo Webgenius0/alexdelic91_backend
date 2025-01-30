@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('city', 100)->nullable();
             $table->string('division', 100)->nullable();
             $table->string('zip_code', 20)->nullable();
-            $table->string('start_time', 100)->nullable();
-            $table->string('end_time', 100)->nullable();
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
             $table->string('instagram')->nullable();
             $table->string('facebook')->nullable();
             $table->string('tiktok')->nullable();
