@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('provider')->nullable(); // Field to store social provider name (e.g., 'google', 'facebook')
             $table->string('provider_id')->nullable(); // Field to store the unique ID from the social provider
             $table->boolean('agree_to_terms')->default(false); // Field to store agreement to terms
+            $table->text('fcm_token')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

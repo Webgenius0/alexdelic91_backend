@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Mail\RegistationOtp;
-use App\Models\EmailOtp;
-use App\Models\User;
-use App\Traits\ApiResponse;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\EmailOtp;
+use App\Traits\ApiResponse;
+use App\Mail\RegistationOtp;
 use Illuminate\Http\Request;
+use App\Enum\NotificationType;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Notifications\NewNotification;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RegisterController extends Controller {
 
@@ -81,6 +83,12 @@ class RegisterController extends Controller {
 
             $user->save();
 
+            $user->notify(new NewNotification(
+                message: 'Your account has been created successfully.',
+                channels: ['database'],
+                type : NotificationType::SUCCESS,
+            ));
+
             if($user->role == 'service_provider') {
                 if($user->serviceProviderProfile != null){
                     $flags = true;
@@ -90,13 +98,13 @@ class RegisterController extends Controller {
             }else{
                 $flags = true;
             }
-            
+
             // Generate a JWT token for the user
             $token = JWTAuth::fromUser($user);
 
             // Add the token to the user object
             $user->setAttribute('token', $token);
-            
+
             // $this->sendOtp($user);
 
             $data = ([
