@@ -18,4 +18,9 @@ class ServiceProviderSubcategory extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function serviceProviders()
+    {
+        return $this->belongsToMany(ServiceProviderProfile::class, 'service_provider_subcategories', 'subcategory_id', 'service_provider_id');
+    }
 }

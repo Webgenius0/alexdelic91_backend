@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Job;
 
 use App\Traits\ApiResponse;
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobPostRequest;
 use App\Interface\JobPostRepositoryInterface;
@@ -20,56 +21,115 @@ class JobPostController extends Controller
 
     public function jobPost(JobPostRequest $request)
     {
-        $jobpost = $this->JobPostRepositoryInterface->jobPost($request->validated());
+        try {
+            $jobpost = $this->JobPostRepositoryInterface->jobPost($request->validated());
 
-        if (!$jobpost) {
-            return $this->error([], "An error occurred while creating the job post", 500);
+            return $this->success($jobpost, 'Job post created successfully', 201);
+
+        } catch (CustomException $e) {
+
+            return $this->error([], $e->getMessage(), $e->getCode());
+
+        } catch (\Exception $e) {
+
+            return $this->error([], "An unexpected error occurred", 500);
         }
-
-        return $this->success($jobpost, 'Job post created successfully', 201);
     }
 
     public function pastJobPost()
     {
-        $jobpost = $this->JobPostRepositoryInterface->pastJobPost();
+        try{
 
-        if (!$jobpost) {
-            return $this->error([], "An error occurred while fetching past job post", 500);
+            $jobpost = $this->JobPostRepositoryInterface->pastJobPost();
+            return $this->success($jobpost, 'Past job post fetched successfully', 200);
+
+        } catch (CustomException $e) {
+
+            return $this->error([], $e->getMessage(), $e->getCode());
+
+        } catch (\Exception $e) {
+
+            return $this->error([], "An unexpected error occurred", 500);
         }
-
-        return $this->success($jobpost, 'Past job post fetched successfully', 200);
     }
 
     public function upcomingJobPost()
     {
-        $jobpost = $this->JobPostRepositoryInterface->upcomingJobPost();    
+        try{
+            $jobpost = $this->JobPostRepositoryInterface->upcomingJobPost();
+            return $this->success($jobpost, 'Upcoming job post fetched successfully', 200);
 
-        if (!$jobpost) {
-            return $this->error([], "An error occurred while fetching upcoming job post", 500);
+        } catch (CustomException $e) {
+
+            return $this->error([], $e->getMessage(), $e->getCode());
+
+        } catch (\Exception $e) {
+
+            return $this->error([], "An unexpected error occurred", 500);
         }
 
-        return $this->success($jobpost, 'Upcoming job post fetched successfully', 200);
     }
 
     public function jobPostDetails($id)
     {
-        $jobpost = $this->JobPostRepositoryInterface->jobPostDetails($id);
+        try {
+            $jobpost = $this->JobPostRepositoryInterface->jobPostDetails($id);
+            return $this->success($jobpost, 'Job post details fetched successfully', 200);
 
-        if (!$jobpost) {
-            return $this->error([], "An error occurred while fetching job post details", 500);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+
+            return $this->error([], "An unexpected error occurred", 500);
         }
 
-        return $this->success($jobpost, 'Job post details fetched successfully', 200);
     }
 
     public function reJobPost(JobPostRequest $request, $id)
     {
-        $jobpost = $this->JobPostRepositoryInterface->reJobPost($request->validated(), $id);
-
-        if (!$jobpost) {
-            return $this->error([], "An error occurred while fetching job post details", 500);
+        try{
+            $jobpost = $this->JobPostRepositoryInterface->reJobPost($request->validated(), $id);
+            return $this->success($jobpost, 'Job post details fetched successfully', 200);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->error([], "An unexpected error occurred", 500);
         }
+    }
 
-        return $this->success($jobpost, 'Job post details fetched successfully', 200);
+    public function pastHistoryDelete()
+    {
+        try {
+            $jobpost = $this->JobPostRepositoryInterface->pastHistoryDelete();
+            return $this->success($jobpost, 'Past job history deleted successfully', 200);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->error([], "An unexpected error occurred", 500);
+        }
+    }
+
+    public function getJobPost()
+    {
+        try {
+            $jobpost = $this->JobPostRepositoryInterface->getJobPost();
+            return $this->success($jobpost, 'Job post fetched successfully', 200);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->error([], "An unexpected error occurred", 500);
+        }
+    }
+
+    public function singelJobPost($id)
+    {
+        try{
+            $jobpost = $this->JobPostRepositoryInterface->singelJobPost($id);
+            return $this->success($jobpost, 'Job post details fetched successfully', 200);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->error([], "An unexpected error occurred", 500);
+        }
     }
 }
