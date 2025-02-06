@@ -60,5 +60,15 @@ class ServiceProviderProfile extends Model
     public function category() {
         return $this->hasOne(Category::class, 'id', 'category_id');
     }
+    public function subCategories()
+    {
+        return $this->belongsToMany(SubCategory::class, 'service_provider_subcategories', 'service_provider_id', 'subcategory_id');
+    }
+
+    public function feedbacks()
+    {
+        return $this->hasManyThrough(Feedback::class, Booking::class, 'service_provider_id', 'booking_id');
+    }
+
 
 }
