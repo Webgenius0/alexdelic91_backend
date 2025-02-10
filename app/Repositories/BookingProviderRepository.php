@@ -28,7 +28,7 @@ class BookingProviderRepository implements BookingProviderInterface
 
         // If user is not found, return an error response
         if (!$user) {
-            return $this->error([], "User Not Found", 404);
+            throw new CustomException("User Not Found", 404);
         }
 
         $provider = User::with('serviceProviderProfile')->findOrFail($data['service_provider_id']);
