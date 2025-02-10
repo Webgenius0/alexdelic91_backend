@@ -147,7 +147,7 @@
     } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-messaging.js";
 
     // firebase service worker
-    // import "https://www.gstatic.com/firebasejs/10.11.1/firebase-messaging-sw.js";
+    import "https://www.gstatic.com/firebasejs/10.11.1/firebase-messaging-sw.js";
 
     // import { } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-messaging-push-scope.js";
     // TODO: Add SDKs for Firebase products that you want to use
@@ -181,48 +181,47 @@
     // var registration = navigator.serviceWorker.register('/public/js/core/firebase/firebase-messaging-sw.js', { type: 'module' });navigator.serviceWorker.register('/public/js/core/firebase/firebase-messaging-sw.js', { type: 'module' })
     // var registration;
     function service_worker() {
-        if (true) {
-            navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-                    type: 'module'
-                })
-                .then(function(registration) {
-                    // console.log('Service worker registration successful:', registration);
-                    getToken(messaging, {
-                        serviceWorkerRegistration: registration,
-                        vapidKey: vapidKey
-                    }).then((currentToken) => {
-                        if (currentToken) {
-                            // Send the token to your server and update the UI if necessary
-                            // ...
-                            console.log(currentToken);
-                            $.post("{{ url('/store_fcm') }}", {
-                                '_token': '{{ csrf_token() }}',
-                                'fcm_token': currentToken,
-                            }).then(function(resp) {
-                                console.log(resp);
-                            });
-
-                        } else {
-                            // Show permission request UI
-                            console.log(
-                                'No registration token available. Request permission to generate one.');
-                            // ...
-                        }
-                    }).catch((err) => {
-                        console.log('An error occurred while retrieving token. ', err);
-                        // ...
-                    });
-                    // Call useServiceWorker() here using the registration object
-                })
-                .catch(function(error) {
-                    console.error('Service worker registration failed:', error);
-                });
+        if (!('serviceWorker' in navigator)) {
+            console.error('Service workers are not supported.');
+            return;
         }
+
+        navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+            type: 'module'
+        }).then(function(registration) {
+            console.log('Service worker registration successful:', registration);
+
+            return getToken(messaging, {
+                serviceWorkerRegistration: registration,
+                vapidKey: vapidKey
+            });
+        }).then((currentToken) => {
+            if (currentToken) {
+                console.log("FCM Token:", currentToken);
+
+                $.post("{{ url('/store_fcm') }}", {
+                    '_token': '{{ csrf_token() }}',
+                    'fcm_token': currentToken,
+                }).done(function(resp) {
+                    console.log("Server Response:", resp);
+                }).fail(function(err) {
+                    console.error("Error storing FCM token:", err);
+                });
+
+            } else {
+                console.warn('No registration token available. Request permission to generate one.');
+            }
+        }).catch((err) => {
+            console.error('An error occurred while retrieving token:', err);
+        });
     }
+
     $(document).ready(function() {
-        // service_worker()
-        setInterval(service_worker(), 300000);
-    })
+        service_worker(); // একবার কল করা হবে লগইনের সময়
+
+        setInterval(service_worker, 300000); // প্রতি ৫ মিনিট পর পর চেক করবে
+    });
+
 
 
     // console.log(registration);
