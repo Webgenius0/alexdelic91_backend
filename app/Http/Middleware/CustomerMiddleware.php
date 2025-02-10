@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CustomerMiddleware
 {
     use ApiResponse;
-    
+
     /**
      * Handle an incoming request.
      *
@@ -25,7 +25,7 @@ class CustomerMiddleware
         } else {
 
             return $this->error([], 'Only Customer Can Access This API', 401);
-            
+
         }
     }
 }
