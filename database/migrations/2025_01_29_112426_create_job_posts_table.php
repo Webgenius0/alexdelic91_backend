@@ -23,7 +23,7 @@ return new class extends Migration
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->text('notes')->nullable();
-            $table->enum('status', ['completed','pending','cancelled','booked','blocked'])->default('pending');
+            $table->enum('status', ['completed','pending','cancelled','booked','blocked','deleted'])->default('pending');
             $table->timestamps();
         });
     }

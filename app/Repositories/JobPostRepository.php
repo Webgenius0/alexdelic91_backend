@@ -1,11 +1,12 @@
 <?php
 namespace App\Repositories;
 
+use App\Exceptions\CustomException;
+use App\Interface\JobPostRepositoryInterface;
 use App\Models\JobPost;
+use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Interface\JobPostRepositoryInterface;
 
 class JobPostRepository implements JobPostRepositoryInterface
 {
@@ -24,7 +25,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            return $this->error([], "User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 404);
         }
 
         try {
@@ -40,8 +41,8 @@ class JobPostRepository implements JobPostRepositoryInterface
                 'category_id'    => $data['category_id'],
                 'subcategory_id' => $data['subcategory_id'],
                 'notes'          => $data['notes'],
-                'start_time' => $data['start_time'],
-                'end_time' => $data['end_time'],
+                'start_time'     => $data['start_time'],
+                'end_time'       => $data['end_time'],
             ]);
 
             if (isset($data['date'])) {
@@ -52,13 +53,16 @@ class JobPostRepository implements JobPostRepositoryInterface
                 }
             }
 
+            if (! $job) {
+                throw new CustomException("Job post not created", 404);
+            }
+
             DB::commit();
             return $job;
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error($e->getMessage());
-            return null;
+            return $e->getMessage();
         }
     }
 
@@ -67,17 +71,23 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            return $this->error([], "User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 404);
         }
 
         $job = JobPost::with([
-            'user', 
-            'category:id,category_name', 
-            'subcategory:id,subcategory_name'
+            'jobPostDates',
+            'category:id,category_name',
+            'subcategory:id,subcategory_name',
+            'user'
         ])
-        ->where('user_id', $user->id)
-        ->whereDate('created_at', '<', now())
-        ->get();
+            ->where('user_id', $user->id)
+            ->whereNot('status', 'deleted')
+            ->whereDate('created_at', '<', now())
+            ->get();
+
+        if (! $job) {
+            throw new CustomException("Job post not found", 404);
+        }
 
         return $job;
     }
@@ -87,17 +97,23 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            return $this->error([], "User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 404);
         }
 
         $job = JobPost::with([
-            'user',
+            'jobPostDates',
             'category:id,category_name',
-            'subcategory:id,subcategory_name'
+            'subcategory:id,subcategory_name',
+            'user'
         ])
-        ->where('user_id', $user->id)
-        ->whereDate('created_at', '>=', now())
-        ->get();
+            ->where('user_id', $user->id)
+            ->whereNot('status', 'deleted')
+            ->whereDate('created_at', '>=', now())
+            ->get();
+
+        if (! $job) {
+            throw new CustomException("Job post not found", 404);
+        }
 
         return $job;
     }
@@ -106,18 +122,24 @@ class JobPostRepository implements JobPostRepositoryInterface
     {
         $user = auth()->user();
 
-        if (!$user) {
-            return $this->error([], "User Unauthorized", 404);
+        if (! $user) {
+            throw new CustomException("User Unauthorized", 404);
         }
 
         $job = JobPost::with([
-            'user',
+            'jobPostDates',
             'category:id,category_name',
-            'subcategory:id,subcategory_name'
+            'subcategory:id,subcategory_name',
+            'user'
         ])
-        ->where('id', $id)
-        ->where('user_id', $user->id)
-        ->first();
+            ->where('id', $id)
+            ->whereNot('status', 'deleted')
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (! $job) {
+            throw new CustomException("Job post not found", 404);
+        }
 
         return $job;
     }
@@ -126,30 +148,112 @@ class JobPostRepository implements JobPostRepositoryInterface
     {
         $user = auth()->user();
 
-        if (!$user) {
-            return $this->error([], "User Unauthorized", 404);
+        if (! $user) {
+            throw new CustomException("User Unauthorized", 404);
         }
 
         $job = JobPost::where('id', $id)
-        ->where('user_id', $user->id)
-        ->create([
-            'user_id'        => $user->id,
-            'title'          => $data['title'],
-            'location'       => $data['location'],
-            'latitude'       => $data['latitude'],
-            'longitude'      => $data['longitude'],
-            'category_id'    => $data['category_id'],
-            'subcategory_id' => $data['subcategory_id'],
-            'notes'          => $data['notes'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-        ]);
+            ->where('user_id', $user->id)
+            ->create([
+                'user_id'        => $user->id,
+                'title'          => $data['title'],
+                'location'       => $data['location'],
+                'latitude'       => $data['latitude'],
+                'longitude'      => $data['longitude'],
+                'category_id'    => $data['category_id'],
+                'subcategory_id' => $data['subcategory_id'],
+                'notes'          => $data['notes'],
+                'start_time'     => $data['start_time'],
+                'end_time'       => $data['end_time'],
+            ]);
         if (isset($data['date'])) {
             foreach ($data['date'] as $date) {
                 $job->jobPostDates()->create([
                     'date' => $date,
                 ]);
             }
+        }
+        if (! $job) {
+            throw new CustomException("An error occurred while creating the job post", 404);
+        }
+
+        return $job;
+    }
+
+    public function pastHistoryDelete()
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            throw new CustomException("User Unauthorized", 404);
+        }
+
+        $job = JobPost::where('user_id', $user->id)
+            ->whereDate('created_at', '<', now())
+            ->update(['status' => 'deleted']);
+
+        if (! $job) {
+            throw new CustomException("Data not found", 404);
+        }
+
+        return $job;
+    }
+
+    public function getJobPost()
+    {
+        $user = auth()->user();
+
+        $data = User::with('serviceProviderProfile:id,user_id,category_id')
+            ->where('id', $user->id)
+            ->first();
+
+        if (!$data || !$data->serviceProviderProfile) {
+            throw new CustomException("User Unauthorized", 404);
+        }
+
+        $categoryId = $data->serviceProviderProfile->category_id;
+
+        $subCategoryId = $data->serviceProviderProfile->subcategories->pluck('id')->toArray();
+
+        // dd($subCategoryId);
+
+        $job = JobPost::with([
+           'jobPostDates',
+            'category:id,category_name',
+            'subcategory:id,subcategory_name',
+            'user'
+        ])
+            ->whereNot('status', 'canceled')
+            ->where('category_id', $categoryId) // Check category_id match
+            ->whereIn('subcategory_id', $subCategoryId) // Check subcategory_id match
+            ->get();                            // Retrieve data
+
+        if ($job->isEmpty()) {
+            throw new CustomException("Data not found", 404);
+        }
+
+        return $job;
+    }
+
+    public function singelJobPost($id)
+    {
+        $auth = auth()->user();
+
+        if(!$auth){
+            throw new CustomException("User Unauthorized", 404);
+        }
+
+        $job = JobPost::with([
+            'jobPostDates',
+            'category:id,category_name',
+            'subcategory:id,subcategory_name',
+            'user'
+        ])
+            ->where('id', $id)
+            ->first();
+
+        if (!$job) {
+            throw new CustomException("Job post not found", 404);
         }
 
         return $job;

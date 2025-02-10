@@ -133,5 +133,102 @@
     });
 </script>
 {{-- dropify end --}}
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import {
+        initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import {
+        getAnalytics
+    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-analytics.js";
+    import {
+        getMessaging,
+        getToken
+    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-messaging.js";
+
+    // firebase service worker
+    // import "https://www.gstatic.com/firebasejs/10.11.1/firebase-messaging-sw.js";
+
+    // import { } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-messaging-push-scope.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCzQzUMhIsTYqyO0zkecabUjdTqy2p2UE0",
+        authDomain: "alexdelic91-ea3f7.firebaseapp.com",
+        projectId: "alexdelic91-ea3f7",
+        storageBucket: "alexdelic91-ea3f7.firebasestorage.app",
+        messagingSenderId: "803905536835",
+        appId: "1:803905536835:web:d7278a9aa5245a89f365f6"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // Initialize Firebase Cloud Messaging and get a reference to the service
+    const messaging = getMessaging(app);
+
+    console.log(messaging, app);
+    const vapidKey = "BI3NtHKT-_Ou9ryPvop8pius9vGVX3asHXc11k_xmmmTgKoM4lAWA1I9H8pHeWXmLR5df1k5Yiwi1zT2LGDnGKg"
+
+
+
+    // var registration = navigator.serviceWorker.register('/public/js/core/firebase/firebase-messaging-sw.js', { type: 'module' });navigator.serviceWorker.register('/public/js/core/firebase/firebase-messaging-sw.js', { type: 'module' })
+    // var registration;
+    function service_worker() {
+        if (true) {
+            navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+                    type: 'module'
+                })
+                .then(function(registration) {
+                    // console.log('Service worker registration successful:', registration);
+                    getToken(messaging, {
+                        serviceWorkerRegistration: registration,
+                        vapidKey: vapidKey
+                    }).then((currentToken) => {
+                        if (currentToken) {
+                            // Send the token to your server and update the UI if necessary
+                            // ...
+                            console.log(currentToken);
+                            $.post("{{ url('/store_fcm') }}", {
+                                '_token': '{{ csrf_token() }}',
+                                'fcm_token': currentToken,
+                            }).then(function(resp) {
+                                console.log(resp);
+                            });
+
+                        } else {
+                            // Show permission request UI
+                            console.log(
+                                'No registration token available. Request permission to generate one.');
+                            // ...
+                        }
+                    }).catch((err) => {
+                        console.log('An error occurred while retrieving token. ', err);
+                        // ...
+                    });
+                    // Call useServiceWorker() here using the registration object
+                })
+                .catch(function(error) {
+                    console.error('Service worker registration failed:', error);
+                });
+        }
+    }
+    $(document).ready(function() {
+        // service_worker()
+        setInterval(service_worker(), 300000);
+    })
+
+
+    // console.log(registration);
+
+
+    console.log(app, analytics, messaging)
+</script>
 
 @stack('script')
