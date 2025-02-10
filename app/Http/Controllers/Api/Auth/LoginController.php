@@ -17,6 +17,8 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class LoginController extends Controller
 {
 
+    public $code;
+
     use ApiResponse;
 
     /**
@@ -38,6 +40,8 @@ class LoginController extends Controller
                 'expires_at'        => Carbon::now()->addMinutes(1),
             ]
         );
+
+        $this->code = $code;
 
         Mail::to($user->email)->send(new ForgotPasswordOtp($user, $code));
     }
@@ -145,7 +149,7 @@ class LoginController extends Controller
 
             $this->sendOtp($user);
 
-            return $this->success($user, 'OTP has been sent successfully.', 200);
+            return $this->success($this->code, 'OTP has been sent successfully.', 200);
         } catch (\Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }
