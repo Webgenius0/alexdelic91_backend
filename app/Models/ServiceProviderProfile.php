@@ -60,7 +60,7 @@ class ServiceProviderProfile extends Model
     }
     public function subCategories()
     {
-        return $this->belongsToMany(SubCategory::class, 'service_provider_subcategories', 'service_provider_id', 'subcategory_id');
+        return $this->belongsToMany(Subcategory::class, 'service_provider_subcategories', 'service_provider_id', 'subcategory_id');
     }
 
     public function feedbacks()
