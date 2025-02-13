@@ -68,10 +68,4 @@ class ServiceProviderProfile extends Model
         return $this->hasManyThrough(Feedback::class, Booking::class, 'service_provider_id', 'booking_id');
     }
 
-
-    public function subcategories()
-    {
-        return $this->belongsToMany(Subcategory::class, 'service_provider_subcategories', 'service_provider_id', 'subcategory_id');
-    }
-
 }
