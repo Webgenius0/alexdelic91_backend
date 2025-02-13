@@ -50,6 +50,8 @@ class UserController extends Controller {
 
         $validator = Validator::make($request->all(), [
             'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:5120',
+            'email'  => 'required|email|unique:users,email,' . auth()->user()->id,
+            'address' => 'nullable|string',
             'name'    => 'required|string|max:255',
         ]);
 
@@ -82,6 +84,8 @@ class UserController extends Controller {
             }
 
             $user->name    = $request->name;
+            $user->email   = $request->email;
+            $user->address = $request->address;
             $user->avatar  = $imageName;
 
             $user->save();
