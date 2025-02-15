@@ -28,5 +28,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ServiceProviderWorkDaysSeeder::class);
         $this->call(BookingSeeder::class);
         $this->call(FeedbackSeeder::class);
+        $this->call(FaqsTableSeeder::class);
     }
 }
