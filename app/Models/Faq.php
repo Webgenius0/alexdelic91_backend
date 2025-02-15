@@ -13,7 +13,7 @@ class Faq extends Model
     ];
 
     protected $hidden = [
-        'sattus',
+        'status',
         'created_at',
         'updated_at',
     ];

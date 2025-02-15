@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\BookMarkController;
 use App\Http\Controllers\Api\User\FeedBackController;
 use App\Http\Controllers\Api\User\ServiceProviderController;
+use App\Http\Controllers\Api\Web\FaqController;
 
 Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group(['middleware' => ['customer']], function() {
@@ -32,6 +33,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             route::post('/rejob-post/{id}', 'reJobPost');
         });
 
+
     });
 
     Route::group(['middleware' => ['service_provider']], function() {
@@ -51,4 +53,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         });
     });
 
+});
+
+Route::controller(FaqController::class)->group(function () {
+    Route::get('/faq', 'getFaq');
 });
