@@ -1,6 +1,6 @@
 @extends('backend.app')
 
-@section('title', 'Dynamic Page')
+@section('title', 'Faq List')
 
 @section('content')
     <!--begin::Toolbar-->
@@ -21,8 +21,7 @@
                             Home </a>
                     </li>
 
-                    <li class="breadcrumb-item text-muted"> Setting </li>
-                    <li class="breadcrumb-item text-muted"> Dynamic Page </li>
+                    <li class="breadcrumb-item text-muted"> Faqs List </li>
 
                 </ul>
                 <!--end::Breadcrumb-->
@@ -37,14 +36,17 @@
             <div class="col-lg-12">
                 <div class="card p-5">
                     <div class="card-style mb-30">
-                        
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="{{ route('admin.faq.create') }}" class="btn btn-success">Add New
+                                Faq</a>
+                        </div>
                         <div class="table-wrapper table-responsive">
                             <table id="data-table" class="table">
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Page Title</th>
-                                        <th>Page Content</th>
+                                        <th>Question</th>
+                                        <th>Answer</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -96,7 +98,7 @@
                     pagingType: "full_numbers",
                     dom: "<'row justify-content-between table-topbar'<'col-md-2 col-sm-4 px-0'l><'col-md-2 col-sm-4 px-0'f>>tipr",
                     ajax: {
-                        url: "{{ route('dynamic_page.index') }}",
+                        url: "{{ route('admin.faq.index') }}",
                         type: "get",
                     },
 
@@ -107,14 +109,14 @@
                             searchable: false
                         },
                         {
-                            data: 'page_title',
-                            name: 'page_title',
+                            data: 'question',
+                            name: 'question',
                             orderable: true,
                             searchable: true
                         },
                         {
-                            data: 'page_content',
-                            name: 'page_content',
+                            data: 'answer',
+                            name: 'answer',
                             orderable: true,
                             searchable: true
                         },
@@ -159,9 +161,9 @@
         }
         // Status Change
         function statusChange(id) {
-            let url = '{{ route('dynamic_page.status', ':id') }}';
+            let url = "{{ route('admin.faq.status', ':id') }}";
             $.ajax({
-                type: "GET",
+                type: "post",
                 url: url.replace(':id', id),
                 success: function(resp) {
                     console.log(resp);
@@ -198,6 +200,36 @@
                     deleteItem(id);
                 }
             });
+        }
+
+        // Delete Button
+        function deleteItem(id) {
+            let url = "{{ route('admin.faq.destroy', ':id') }}";
+            let csrfToken = '{{ csrf_token() }}';
+            $.ajax({
+                type: "DELETE",
+                url: url.replace(':id', id),
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                success: function(resp) {
+                    console.log(resp);
+                    // Reloade DataTable
+                    $('#data-table').DataTable().ajax.reload();
+                    if (resp.success === true) {
+                        // show toast message
+                        toastr.success(resp.message);
+
+                    } else if (resp.errors) {
+                        toastr.error(resp.errors[0]);
+                    } else {
+                        toastr.error(resp.message);
+                    }
+                },
+                error: function(error) {
+                    // location.reload();
+                }
+            })
         }
 
     </script>
