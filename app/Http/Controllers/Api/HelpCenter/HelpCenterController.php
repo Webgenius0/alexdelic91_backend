@@ -16,8 +16,8 @@ class HelpCenterController extends Controller
     use ApiResponse;
 
     public function requestForHelp(Request $request) {
+        
         $validatedData = Validator::make($request->all(), [
-            'user_id' => 'required',
             'name' => 'required|string',
             'email' => 'required|email',
             'message' => 'required|string',
@@ -27,11 +27,23 @@ class HelpCenterController extends Controller
            return $this->error($validatedData->errors()->first(), 'Validation Error', 422);
         }
 
-       $data = HelpCenter::create($validatedData->validated());
-       $adminEmail = User::where('role', 'admin')->first()->email;
+        $user = auth()->user();
 
-       Mail::to($adminEmail)->send(new HelpCenterMail($data));
+        if (!$user) {
+            return $this->error([], "User Unauthorized", 401); 
+        }
 
-       return $this->success($data, 'Help request sent successfully', 201);
+        $data = HelpCenter::create([
+            'user_id' => $user->id,
+            'name' => $request->name,
+            'email' => $request->email,
+            'message' => $request->message,
+        ]);
+
+        $adminEmail = User::where('role', 'admin')->first()->email;
+
+        Mail::to($adminEmail)->send(new HelpCenterMail($data));
+
+        return $this->success($data, 'Help request sent successfully', 201);
     }
 }
