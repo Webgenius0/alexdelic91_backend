@@ -19,7 +19,7 @@ class ProviderController extends Controller
     }
 
     public function providers(Request $request) {
-        $queryParams = $request->only(['business_name','distance_range','category_id','subcategory_id','avg_rating']) ?? [];
+        $queryParams = $request->only(['business_name','latitude','longitude','radius','category_id','subcategory_id','avg_rating']) ?? [];
 
         $providers = $this->serviceProviderRepository->providers($queryParams);
 

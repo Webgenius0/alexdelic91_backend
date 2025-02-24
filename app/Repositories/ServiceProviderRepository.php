@@ -17,7 +17,7 @@ class ServiceProviderRepository implements ServiceProviderInterface
 
     public function providers(array $queryParams) {
 
-        $data = ServiceProviderProfile::query()->with(['user','subCategories','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime','category.subCategories','booking.feedbacks']);
+        $data = ServiceProviderProfile::query()->with(['user','subCategories','serviceType','serviceLocation','workingDays','serviceProviderImage','bookingDataAndTime','category.subCategories','booking.feedbacks'])->withAvg('feedbacks', 'rating');
 //        return $data->get();
         if ($queryParams == []) {
             return $data->get();
@@ -27,7 +27,15 @@ class ServiceProviderRepository implements ServiceProviderInterface
         }
 
         if (!empty($queryParams['latitude']) && !empty($queryParams['longitude'] && !empty($queryParams['radius']))) {
-            $data = $data->selectRaw("*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance", [$queryParams['latitude'], $queryParams['longitude'], $queryParams['latitude']])->having('distance', '<', $queryParams['radius']);
+
+            $radiusInMeters = $queryParams['radius']; 
+            $radiusInDegrees = $radiusInMeters / 111000;
+            
+            $data = $data->where('latitude', '>=', $queryParams['latitude'] - $radiusInDegrees)
+                        ->where('latitude', '<=', $queryParams['latitude'] + $radiusInDegrees)
+                        ->where('longitude', '>=', $queryParams['longitude'] - ($radiusInDegrees / cos(deg2rad($queryParams['latitude']))))
+                        ->where('longitude', '<=', $queryParams['longitude'] + ($radiusInDegrees / cos(deg2rad($queryParams['latitude']))));
+            
 
         }
 
