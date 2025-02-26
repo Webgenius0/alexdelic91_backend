@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
@@ -14,8 +15,8 @@ class BookMarkController extends Controller
     {
         $user = auth()->user();
 
-        if (! $user) {
-            return $this->error([], "User Unauthorized", 404);
+        if (!$user) {
+            return $this->error([], "User Unauthorized", 401);
         }
 
         $existingBookmark = BookMark::where('user_id', $user->id)
@@ -34,7 +35,7 @@ class BookMarkController extends Controller
             ]);
 
             if (! $data) {
-                return $this->error([], "Something went wrong", 404);
+                return $this->error([], "Something went wrong", 200);
             }
             return $this->success($data, "Bookmarked Successfully", 200);
         }
@@ -44,7 +45,7 @@ class BookMarkController extends Controller
     {
         $user = auth()->user();
 
-        if (! $user) {
+        if (!$user) {
             return $this->error([], "User Unauthorized", 401);
         }
 
@@ -53,18 +54,18 @@ class BookMarkController extends Controller
                 $query->select('id', 'user_id', 'business_name', 'address', 'latitude', 'longitude');
             },
             'serviceProvider.serviceProviderProfile.serviceProviderImage:id,service_provider_id,images',
-            'serviceProvider.bookings.feedbacks:id,service_provider_id,booking_id,rating', 
+            'serviceProvider.bookings.feedbacks:id,service_provider_id,booking_id,rating',
         ])
             ->where('user_id', $user->id)
             ->get()
             ->map(function ($bookmark) {
                 // Get feedbacks for the specific service provider
                 $feedbacks = $bookmark->user->bookings->flatMap->feedbacks->where('booking.service_provider_id', $bookmark->service_provider_id);
-                
+
                 // Calculate the average rating for the specific service provider
                 $averageRating = $feedbacks->isNotEmpty()
-                ? round($feedbacks->avg('rating'), 2)
-                : 0;
+                    ? round($feedbacks->avg('rating'), 2)
+                    : 0;
 
                 $bookmark->average_rating = $averageRating;
 
@@ -78,10 +79,9 @@ class BookMarkController extends Controller
             });
 
         if ($bookmarks->isEmpty()) {
-            return $this->error([], "No Bookmarks Found", 404);
+            return $this->error([], "No Bookmarks Found", 200);
         }
 
         return $this->success($bookmarks, "Bookmarks Found Successfully", 200);
     }
-
 }
