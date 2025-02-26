@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Exceptions\CustomException;
@@ -25,7 +26,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            throw new CustomException("User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 401);
         }
 
         try {
@@ -54,12 +55,11 @@ class JobPostRepository implements JobPostRepositoryInterface
             }
 
             if (! $job) {
-                throw new CustomException("Job post not created", 404);
+                throw new CustomException("Job post not created", 200);
             }
 
             DB::commit();
             return $job;
-
         } catch (\Exception $e) {
             DB::rollBack();
             return $e->getMessage();
@@ -71,7 +71,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            throw new CustomException("User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 401);
         }
 
         $job = JobPost::with([
@@ -86,7 +86,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->get();
 
         if (! $job) {
-            throw new CustomException("Job post not found", 404);
+            throw new CustomException("Job post not found", 200);
         }
 
         return $job;
@@ -97,7 +97,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            throw new CustomException("User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 401);
         }
 
         $job = JobPost::with([
@@ -112,7 +112,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->get();
 
         if (! $job) {
-            throw new CustomException("Job post not found", 404);
+            throw new CustomException("Job post not found", 200);
         }
 
         return $job;
@@ -123,7 +123,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            throw new CustomException("User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 401);
         }
 
         $job = JobPost::with([
@@ -138,7 +138,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->first();
 
         if (! $job) {
-            throw new CustomException("Job post not found", 404);
+            throw new CustomException("Job post not found", 200);
         }
 
         return $job;
@@ -149,7 +149,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            throw new CustomException("User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 401);
         }
 
         $job = JobPost::where('id', $id)
@@ -174,7 +174,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             }
         }
         if (! $job) {
-            throw new CustomException("An error occurred while creating the job post", 404);
+            throw new CustomException("An error occurred while creating the job post", 200);
         }
 
         return $job;
@@ -185,7 +185,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         $user = auth()->user();
 
         if (! $user) {
-            throw new CustomException("User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 401);
         }
 
         $job = JobPost::where('user_id', $user->id)
@@ -193,7 +193,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->update(['status' => 'deleted']);
 
         if (! $job) {
-            throw new CustomException("Data not found", 404);
+            throw new CustomException("Data not found", 200);
         }
 
         return $job;
@@ -208,7 +208,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->first();
 
         if (!$data || !$data->serviceProviderProfile) {
-            throw new CustomException("User Unauthorized", 404);
+            throw new CustomException("User Unauthorized", 401);
         }
 
         $categoryId = $data->serviceProviderProfile->category_id;
@@ -218,7 +218,7 @@ class JobPostRepository implements JobPostRepositoryInterface
         // dd($subCategoryId);
 
         $job = JobPost::with([
-           'jobPostDates',
+            'jobPostDates',
             'category:id,category_name',
             'subcategory:id,subcategory_name',
             'user'
@@ -229,7 +229,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->get();                            // Retrieve data
 
         if ($job->isEmpty()) {
-            throw new CustomException("Data not found", 404);
+            throw new CustomException("Data not found", 200);
         }
 
         return $job;
@@ -239,8 +239,8 @@ class JobPostRepository implements JobPostRepositoryInterface
     {
         $auth = auth()->user();
 
-        if(!$auth){
-            throw new CustomException("User Unauthorized", 404);
+        if (!$auth) {
+            throw new CustomException("User Unauthorized", 401);
         }
 
         $job = JobPost::with([
@@ -253,10 +253,9 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->first();
 
         if (!$job) {
-            throw new CustomException("Job post not found", 404);
+            throw new CustomException("Job post not found", 200);
         }
 
         return $job;
     }
-
 }
