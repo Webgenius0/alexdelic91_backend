@@ -37,7 +37,7 @@ class ServiceProviderRepository implements ServiceProviderInterface
             // Add the is_bookmark flag
             $providers->map(function ($provider) use ($bookmarkedProviderIds) {
                 // Check if the provider's user_id is in the bookmarked list
-                $provider->is_bookmark = in_array($provider->id, $bookmarkedProviderIds);
+                $provider->is_bookmark = in_array($provider->user_id, $bookmarkedProviderIds);
                 return $provider;
             });
 
@@ -83,7 +83,7 @@ class ServiceProviderRepository implements ServiceProviderInterface
         // Add the is_bookmark flag
         $providers->map(function ($provider) use ($bookmarkedProviderIds) {
             // Check if the provider's user_id is in the bookmarked list
-            $provider->is_bookmark = in_array($provider->id, $bookmarkedProviderIds);
+            $provider->is_bookmark = in_array($provider->user_id, $bookmarkedProviderIds);
             return $provider;
         });
 
