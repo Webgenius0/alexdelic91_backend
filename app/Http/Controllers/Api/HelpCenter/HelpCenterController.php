@@ -15,22 +15,23 @@ class HelpCenterController extends Controller
 {
     use ApiResponse;
 
-    public function requestForHelp(Request $request) {
-        
-        $validatedData = Validator::make($request->all(), [
+    public function requestForHelp(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|email',
             'message' => 'required|string',
         ]);
 
-        if($validatedData->fails()) {
-           return $this->error($validatedData->errors()->first(), 'Validation Error', 422);
+        if ($validator->fails()) {
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         $user = auth()->user();
 
         if (!$user) {
-            return $this->error([], "User Unauthorized", 401); 
+            return $this->error([], "User Unauthorized", 401);
         }
 
         $data = HelpCenter::create([
