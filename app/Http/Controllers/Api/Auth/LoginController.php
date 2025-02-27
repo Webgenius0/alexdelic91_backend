@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
@@ -97,7 +98,6 @@ class LoginController extends Controller
             $userData = auth()->user();
 
             $userData->setAttribute('token', $token);
-
         } else {
             return $this->error([], 'Invalid credentials', 401);
         }
@@ -111,7 +111,6 @@ class LoginController extends Controller
             }
         } else {
             $flags = true;
-
         }
 
         $data = [
@@ -258,7 +257,7 @@ class LoginController extends Controller
 
             $user->password = Hash::make($request->input('password'));
             $user->save();
-            
+
             $token = JWTAuth::fromUser($user);
             $user->setAttribute('token', $token);
 
