@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\Banner\BannerController;
 use App\Http\Controllers\Api\BookingProvider\BookingProviderController;
 use App\Http\Controllers\Api\Category\CategoryController;
 use App\Http\Controllers\Api\HelpCenter\HelpCenterController;
@@ -21,7 +22,9 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-Route::group(['middleware' => ['jwt.verify']], function() {
+Route::get('/banners', BannerController::class);
+
+Route::group(['middleware' => ['jwt.verify']], function () {
 
     Route::controller(BookingProviderController::class)->prefix('booking')->group(function () {
         Route::post('/create', 'book');
@@ -39,8 +42,4 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::get('/get/provider', 'getProviderBookings');
         Route::get('/get/provider/history', 'getProviderBookingsHistory');
     });
-
 });
-
-
-
