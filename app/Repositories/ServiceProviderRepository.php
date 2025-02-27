@@ -27,7 +27,21 @@ class ServiceProviderRepository implements ServiceProviderInterface
 
         //        return $data->get();
         if ($queryParams == []) {
-            return $data->get();
+            $providers = $data->get();
+
+            $bookmarkedProviderIds = DB::table('book_marks')
+                ->where('user_id', $userId)
+                ->pluck('service_provider_id')
+                ->toArray();
+            // return $bookmarkedProviderIds;
+            // Add the is_bookmark flag
+            $providers->map(function ($provider) use ($bookmarkedProviderIds) {
+                // Check if the provider's user_id is in the bookmarked list
+                $provider->is_bookmark = in_array($provider->id, $bookmarkedProviderIds);
+                return $provider;
+            });
+
+            return $providers;
         }
         if (!empty($queryParams['business_name'])) {
             $data = $data->where('business_name', 'like', '%' . $queryParams['business_name'] . '%');
