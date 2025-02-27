@@ -28,10 +28,10 @@ class BookingProviderRepository implements BookingProviderInterface
 
         // If user is not found, return an error response
         if (!$user) {
-            throw new CustomException("User Not Found", 404);
+            throw new CustomException("User Not Found", 200);
         }
 
-        $provider = User::with('serviceProviderProfile')->findOrFail($data['service_provider_id']);
+        $provider = User::with('serviceProviderProfile')->find($data['service_provider_id']);
 
         // Check if booking is within the provider's available hours
         if (!$provider->isAvailableForBooking($data['start_time'], $data['end_time'])) {
@@ -44,209 +44,207 @@ class BookingProviderRepository implements BookingProviderInterface
             throw new CustomException("Booking overlaps with another booking", 409);
         }
 
-        try {
+        $booking = Booking::create([
+            'user_id' => $user->id,
+            'service_provider_id' => $data['service_provider_id'],
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
+            'booking_date' => $data['booking_date'],
+            'address' => $data['address'],
+            'latitude' => $data['latitude'],
+            'longitude' => $data['longitude'],
+            'notes' => $data['notes'],
+        ]);
 
-            $booking = Booking::create([
-                'user_id' => $user->id,
-                'service_provider_id' => $data['service_provider_id'],
-                'start_time' => $data['start_time'],
-                'end_time' => $data['end_time'],
-                'booking_date' => $data['booking_date'],
-                'address' => $data['address'],
-                'latitude' => $data['latitude'],
-                'longitude' => $data['longitude'],
-                'notes' => $data['notes'],
-            ]);
-
-            return $booking;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return $booking;
     }
 
     public function pastBookings()
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
 
+        $user = auth()->user();
+
         $bookings = Booking::with([
-                'serviceProvider:id,name,avatar',
-                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
-                'serviceProvider.serviceProviderProfile.category:id,category_name'
-            ])
+            'serviceProvider:id,name,avatar',
+            'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+            'serviceProvider.serviceProviderProfile.category:id,category_name'
+        ])
             ->where('user_id', $user->id)
             ->whereDate('booking_date', '<', now())
             ->get();
+
+        if ($bookings->isEmpty()) {
+            throw new CustomException("No past bookings found", 200);
+        }
 
         return $bookings;
     }
 
     public function upcomingBookings()
     {
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
+        }
         $user = auth()->user();
 
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
-        }
-
         $bookings = Booking::with([
-                'serviceProvider:id,name,avatar',
-                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
-                'serviceProvider.serviceProviderProfile.category:id,category_name'
-            ])
+            'serviceProvider:id,name,avatar',
+            'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+            'serviceProvider.serviceProviderProfile.category:id,category_name'
+        ])
             ->where('user_id', $user->id)
             ->whereDate('booking_date', '>=', now())
             ->get();
+
+        if ($bookings->isEmpty()) {
+            throw new CustomException("No upcoming bookings found", 404);
+        }
 
         return $bookings;
     }
 
     public function single($id)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
 
+        $user = auth()->user();
+
         $booking = Booking::with([
-                'serviceProvider:id,name,avatar',
-                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
-                'serviceProvider.serviceProviderProfile.category:id,category_name'
-            ])
+            'serviceProvider:id,name,avatar',
+            'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+            'serviceProvider.serviceProviderProfile.category:id,category_name'
+        ])
             ->where('user_id', $user->id)
             ->where('id', $id)
             ->first();
 
+        if (!$booking) {
+            throw new CustomException("Booking not found", 404);
+        }
+
         return $booking;
     }
 
+
     public function providerSingle($id)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
 
+        $user = auth()->user();
+
         $booking = Booking::with([
-                'user:id,name,avatar',
-                'serviceProvider:id',
-                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
-                'serviceProvider.serviceProviderProfile.category:id,category_name'
-            ])
+            'user:id,name,avatar',
+            'serviceProvider:id',
+            'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+            'serviceProvider.serviceProviderProfile.category:id,category_name'
+        ])
             ->where('service_provider_id', $user->id)
             ->where('id', $id)
             ->first();
+
+        if (!$booking) {
+            throw new CustomException("Booking not found", 200);
+        }
 
         return $booking;
     }
 
     public function edit($data, $id)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
+
+        $user = auth()->user();
 
         $booking = Booking::where('user_id', $user->id)
             ->where('id', $id)
             ->first();
 
         if (!$booking) {
-            return $this->error([], "Booking Not Found", 404);
+            throw new CustomException("Booking Not Found", 200);
         }
 
-        try {
-            $booking->update([
-                'start_time' => $data['start_time'],
-                'end_time' => $data['end_time'],
-                'booking_date' => $data['booking_date'],
-                'address' => $data['address'],
-                'latitude' => $data['latitude'],
-                'longitude' => $data['longitude'],
-                'notes' => $data['notes'],
-            ]);
+        $booking->update([
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
+            'booking_date' => $data['booking_date'],
+            'address' => $data['address'],
+            'latitude' => $data['latitude'],
+            'longitude' => $data['longitude'],
+            'notes' => $data['notes'],
+        ]);
 
-            return $booking;
-        } catch (\Exception $e) {
-            return null;
-        }
+        return $booking;
     }
 
     public function cancel($id)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
+
+        $user = auth()->user();
 
         $booking = Booking::where('user_id', $user->id)
             ->where('id', $id)
             ->first();
 
         if (!$booking) {
-            return $this->error([], "Booking Not Found", 404);
+            throw new CustomException("Booking Not Found", 200);
         }
 
-        try {
-            $booking->status = 'cancelled';
-            $booking->save();
+        $booking->status = 'cancelled';
+        $booking->save();
 
-            return $this->success([], "Booking canceled successfully", 200);
-        } catch (\Exception $e) {
-            return null;
-        }
+        return $booking;
     }
 
     public function booked($id)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
+
+        $user = auth()->user();
 
         $booking = Booking::where('user_id', $user->id)
             ->where('id', $id)
             ->first();
 
         if (!$booking) {
-            return $this->error([], "Booking Not Found", 404);
+            throw new CustomException("Booking Not Found", 200);
         }
 
-        try {
-            $booking->status = 'booked';
-            $booking->save();
+        $booking->status = 'booked';
+        $booking->save();
 
-            return $this->success([], "Booking booked successfully", 200);
-        } catch (\Exception $e) {
-            return null;
-        }
+        return $booking;
     }
 
     public function getProviderBookings($date)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
 
+        $user = auth()->user();
+
         $query = Booking::with([
-                'user:id,name,avatar',
-                'serviceProvider:id',
-                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
-                'serviceProvider.serviceProviderProfile.category:id,category_name'
-            ])
+            'user:id,name,avatar',
+            'serviceProvider:id',
+            'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+            'serviceProvider.serviceProviderProfile.category:id,category_name'
+        ])
             ->where('service_provider_id', $user->id)
             ->whereNot('status', 'deleted');
-
 
         if ($date) {
             $query->whereDate('booking_date', $date);
@@ -254,59 +252,60 @@ class BookingProviderRepository implements BookingProviderInterface
 
         $bookings = $query->get();
 
+        if ($bookings->isEmpty()) {
+            throw new CustomException("No bookings found", 200);
+        }
+
         return $bookings;
     }
 
     public function getProviderBookingsHistory()
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
 
+        $user = auth()->user();
+
         $bookings = Booking::with([
-                'user:id,name,avatar',
-                'serviceProvider:id',
-                'serviceProvider.serviceProviderProfile:id,user_id,category_id',
-                'serviceProvider.serviceProviderProfile.category:id,category_name'
-            ])
+            'user:id,name,avatar',
+            'serviceProvider:id',
+            'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+            'serviceProvider.serviceProviderProfile.category:id,category_name'
+        ])
             ->where('service_provider_id', $user->id)
             ->whereDate('booking_date', '<', now())
             ->whereNot('status', 'deleted')
             ->get();
+
+        if ($bookings->isEmpty()) {
+            throw new CustomException("No past bookings found", 200);
+        }
 
         return $bookings;
     }
 
     public function providerWithRatingSingle($id)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return $this->error([], "User Not Found", 404);
+        if (!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
         }
 
-        try {
-            $booking = Booking::with([
-                    'user:id,name,avatar',
-                    'serviceProvider:id',
-                    'serviceProvider.serviceProviderProfile:id,user_id,category_id',
-                    'serviceProvider.serviceProviderProfile.category:id,category_name',
-                    'feedback'
-                ])
-                ->where('service_provider_id', $user->id)
-                ->where('id', $id)
-                ->first();
+        $user = auth()->user();
 
-            if (!$booking) {
-                return $this->error([], "Booking Not Found", 404);
-            }
+        $booking = Booking::with([
+            'user:id,name,avatar',
+            'serviceProvider:id',
+            'serviceProvider.serviceProviderProfile:id,user_id,category_id',
+            'serviceProvider.serviceProviderProfile.category:id,category_name',
+            'feedback'
+        ])
+            ->where('service_provider_id', $user->id)
+            ->where('id', $id)
+            ->first();
 
-            return $booking;
-        } catch (\Exception $e) {
-
-            return $e->getMessage();
+        if (!$booking) {
+            throw new CustomException("Booking Not Found", 200);
         }
 
         return $booking;
