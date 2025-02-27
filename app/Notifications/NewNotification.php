@@ -35,7 +35,7 @@ class NewNotification extends Notification implements ShouldQueue
      */
     public function __construct(
         $from = 'mr7517218@gmail.com',
-        $owner = 'kemzieea',
+        $owner = 'Alexdelic91',
         $subject = 'New Notification',
         $message = null,
         $actionText = 'Dashboard',
