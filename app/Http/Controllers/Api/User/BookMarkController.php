@@ -34,9 +34,10 @@ class BookMarkController extends Controller
                 'service_provider_id' => $id,
             ]);
 
-            if (! $data) {
+            if (!$data) {
                 return $this->error([], "Something went wrong", 200);
             }
+
             return $this->success($data, "Bookmarked Successfully", 200);
         }
     }
@@ -54,11 +55,17 @@ class BookMarkController extends Controller
                 $query->select('id', 'user_id', 'business_name', 'address', 'latitude', 'longitude');
             },
             'serviceProvider.serviceProviderProfile.serviceProviderImage:id,service_provider_id,images',
-            'serviceProvider.bookings.feedbacks:id,service_provider_id,booking_id,rating',
+            'serviceProvider.bookings.feedbacks:id,booking_id,rating',
         ])
             ->where('user_id', $user->id)
             ->get()
             ->map(function ($bookmark) {
+
+                // Ensure service provider exists
+                if (!$bookmark->serviceProvider) {
+                    return null;
+                }
+
                 // Get feedbacks for the specific service provider
                 $feedbacks = $bookmark->user->bookings->flatMap->feedbacks->where('booking.service_provider_id', $bookmark->service_provider_id);
 
@@ -75,6 +82,7 @@ class BookMarkController extends Controller
                     'service_provider_id' => $bookmark->service_provider_id,
                     'service_provider'    => $bookmark->serviceProvider->serviceProviderProfile,
                     'average_rating'      => $averageRating,
+                    'is_bookmark'         => true,
                 ];
             });
 
