@@ -10,14 +10,14 @@ use App\Http\Controllers\Controller;
 class FaqController extends Controller
 {
     use ApiResponse;
-    
+
     public function getFaq()
     {
-       
+
         $data = Faq::where('status', 'active')->get();
 
         if (empty($data)) {
-            return $this->error('Faq not found', 404);
+            return $this->error('Faq not found', 200);
         }
 
         return $this->success($data, 'Faq fetched successfully', 200);
