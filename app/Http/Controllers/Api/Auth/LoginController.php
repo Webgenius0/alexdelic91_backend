@@ -90,7 +90,7 @@ class LoginController extends Controller
 
         if ($userData && Hash::check($request->password, $userData->password)) {
 
-            if (! $token = JWTAuth::attempt($credentials)) {
+            if (!$token = JWTAuth::attempt($credentials)) {
                 return $this->error([], 'Invalid credentials', 401);
             }
 
@@ -258,6 +258,10 @@ class LoginController extends Controller
 
             $user->password = Hash::make($request->input('password'));
             $user->save();
+            
+            $token = JWTAuth::fromUser($user);
+            $user->setAttribute('token', $token);
+
 
             return $this->success($user, 'Password Reset successfully.', 200);
         } catch (\Exception $e) {
