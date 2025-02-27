@@ -36,7 +36,7 @@ class LoginController extends Controller
             ['user_id' => $user->id],
             [
                 'verification_code' => $code,
-                'expires_at'        => Carbon::now()->addMinutes(1),
+                'expires_at'        => Carbon::now()->addMinutes(5),
             ]
         );
 
@@ -81,7 +81,7 @@ class LoginController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error([], $validator->errors()->first(), 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         $credentials = $request->only('email', 'password');
