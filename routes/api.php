@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\Web\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,4 +66,10 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::get('/service/location', 'getLocation');
     });
 
+    Route::controller(NotificationController::class)->group(function () {
+        Route::get('/notifications', 'getNotifications');
+    });
+    
 });
+
+
