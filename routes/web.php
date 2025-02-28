@@ -1,8 +1,7 @@
 <?php
-
-use App\Http\Controllers\Web\NotificationController;
 use App\Models\DynamicPage;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\NotificationController;
 
 require __DIR__.'/auth.php';
 
@@ -16,6 +15,8 @@ Route::get('/terms-and-conditions', function () {
     return response()->json($termsAndConditions);
 });
 
-Route::get('/test', [NotificationController::class, 'test_firebase']);
+Route::controller(NotificationController::class)->group(function () {
+    Route::get('/send-notifications', 'sendNotifications');
+   
+});
 
-Route::post('/store_fcm', [NotificationController::class, 'store_fcm']);

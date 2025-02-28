@@ -10,6 +10,7 @@ use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -75,6 +76,8 @@ class LoginController extends Controller
 
     public function userLogin(Request $request)
     {
+        Log::info('Retrive all data:  '.$request->all());
+
         $validator = Validator::make($request->all(), [
             'email'    => 'required|email|exists:users,email',
             'password' => 'required',
@@ -93,10 +96,18 @@ class LoginController extends Controller
             if (!$token = JWTAuth::attempt($credentials)) {
                 return $this->error([], 'Invalid credentials', 401);
             }
-
             $userData = auth()->user();
 
             $userData->setAttribute('token', $token);
+            if ($request->has('device_token')) {
+
+                Log::info('Device token:  '.$request->device_token);
+
+                $userData->fcm_token = $request->device_token;
+                $userData->save();
+            }
+
+            Log::info('User data:  '.$userData);
 
         } else {
             return $this->error([], 'Invalid credentials', 401);

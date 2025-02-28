@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2",
         "google/apiclient": "^2.18",
+        "google/auth": "^1.46",
         "kreait/firebase-php": "^7.10",
         "kreait/laravel-firebase": "^5.8",
         "laravel/framework": "^11.9",
