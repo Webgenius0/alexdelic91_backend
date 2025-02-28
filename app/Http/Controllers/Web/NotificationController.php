@@ -13,7 +13,9 @@ class NotificationController extends Controller
 
     public function sendNotifications()
     {
-        $deviceTokens = '';
+        $user = auth()->user();
+        $deviceTokens =$user->fcm_token;
+        dd($deviceTokens);
 
         $title = 'Test Notification';
         $body = 'This is a test notification';
