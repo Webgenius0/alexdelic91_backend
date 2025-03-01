@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\Web\Frontend;
 
-use App\Http\Controllers\Controller;
 use App\Models\DynamicPage;
-use App\Models\Faq;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class PageController extends Controller
 {
