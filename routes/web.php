@@ -2,6 +2,7 @@
 use App\Models\DynamicPage;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\NotificationController;
+use App\Http\Controllers\Web\Frontend\PageController;
 
 require __DIR__.'/auth.php';
 
