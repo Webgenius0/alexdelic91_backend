@@ -5,15 +5,9 @@ use App\Http\Controllers\Web\NotificationController;
 
 require __DIR__.'/auth.php';
 
-Route::get('/privacy-policy', function () {
-    $privacyPolicy = DynamicPage::where('id', 1)->first();
-    return response()->json($privacyPolicy);
-});
+Route::get('/page/privacy-and-policy', [PageController::class, 'privacyAndPolicy'])->name('dynamicPage.privacyAndPolicy');
 
-Route::get('/terms-and-conditions', function () {
-    $termsAndConditions = DynamicPage::where('id', 2)->first();
-    return response()->json($termsAndConditions);
-});
+Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'])->name('dynamicPage.termsAndConditions');
 
 Route::controller(NotificationController::class)->group(function () {
     Route::get('/send-notifications', 'sendNotifications');

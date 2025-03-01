@@ -16,4 +16,12 @@ class PageController extends Controller
                         ->firstOrFail();
         return view('frontend.layouts.pages.singleDynamicPage', compact('dynamicPage'));
     }
+
+    public function termsAndConditions() {
+        $dynamicPage = DynamicPage::query()
+                        ->where('status','active')
+                        ->where('id', 2)
+                        ->firstOrFail();
+        return view('frontend.layouts.pages.singleDynamicPage', compact('dynamicPage'));
+    }
 }
