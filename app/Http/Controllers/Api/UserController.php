@@ -17,7 +17,8 @@ use App\Models\ServiseProviderWorkDay;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ServiceProviderSubcategory;
 
-class UserController extends Controller {
+class UserController extends Controller
+{
     use ApiResponse;
 
     /**
@@ -26,14 +27,15 @@ class UserController extends Controller {
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-    public function userData() {
+    public function userData()
+    {
 
         $user = auth()->user();
 
-        $data = User::with('serviceProviderProfile.serviceProviderImage','serviceProviderProfile.workingDays')->where('id', $user->id)->first();
+        $data = User::with('serviceProviderProfile.serviceProviderImage', 'serviceProviderProfile.workingDays')->where('id', $user->id)->first();
 
         if (!$data) {
-            return $this->error([], 'User Not Found', 404);
+            return $this->error([], 'User Not Found', 200);
         }
 
         return $this->success($data, 'User data fetched successfully', 200);
@@ -46,7 +48,8 @@ class UserController extends Controller {
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-    public function userUpdate(Request $request) {
+    public function userUpdate(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:5120',
@@ -65,7 +68,7 @@ class UserController extends Controller {
 
             // If user is not found, return an error response
             if (!$user) {
-                return $this->error([], "User Not Found", 404);
+                return $this->error([], "User Not Found", 200);
             }
 
             if ($request->hasFile('avatar')) {
@@ -102,7 +105,8 @@ class UserController extends Controller {
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse JSON response with success or error.
      */
-    public function logoutUser() {
+    public function logoutUser()
+    {
 
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
@@ -111,7 +115,6 @@ class UserController extends Controller {
         } catch (\Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }
-
     }
 
     /**
@@ -119,14 +122,15 @@ class UserController extends Controller {
      *
      * @return \Illuminate\Http\JsonResponse JSON response with success or error.
      */
-    public function deleteUser() {
+    public function deleteUser()
+    {
         try {
             // Get the authenticated user
             $user = auth()->user();
 
             // If user is not found, return an error response
             if (!$user) {
-                return $this->error([], "User Not Found", 404);
+                return $this->error([], "User Not Found", 200);
             }
 
             // Delete the user's avatar if it exists
@@ -170,19 +174,19 @@ class UserController extends Controller {
             'days' => 'required|array',
             'days.*' => 'required|integer',
         ]);
-    
+
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
-    
+
         $user = Auth::user(); // Get the authenticated user
         if (!$user) {
-            return $this->error([], "User Not Found", 404);
+            return $this->error([], "User Not Found", 200);
         }
-    
+
         try {
             DB::beginTransaction();
-    
+
             // Create service provider profile
             $service_provider = ServiceProviderProfile::create([
                 'user_id' => $user->id,
@@ -200,7 +204,7 @@ class UserController extends Controller {
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
             ]);
-    
+
             // Handle gallery images
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -211,7 +215,7 @@ class UserController extends Controller {
                     ]);
                 }
             }
-    
+
             // Handle subcategories
             if (is_array($request->subcategories)) {
                 foreach ($request->subcategories as $subcategory_id) {
@@ -221,7 +225,7 @@ class UserController extends Controller {
                     ]);
                 }
             }
-    
+
             // Handle workdays
             if (is_array($request->days)) {
                 foreach ($request->days as $day_id) {
@@ -231,7 +235,7 @@ class UserController extends Controller {
                     ]);
                 }
             }
-    
+
             DB::commit();
             return $this->success($service_provider, 'Service Provider created successfully', 200);
         } catch (\Exception $e) {
@@ -244,7 +248,7 @@ class UserController extends Controller {
     {
         $days = Day::all();
         if (!$days) {
-            return $this->error([], 'Days not found', 404);
+            return $this->error([], 'Days not found', 200);
         }
         return $this->success($days, 'Days fetched successfully', 200);
     }
@@ -253,9 +257,8 @@ class UserController extends Controller {
     {
         $data = ServiceLocation::all();
         if (!$data) {
-            return $this->error([], 'Locations not found', 404);
+            return $this->error([], 'Locations not found', 200);
         }
         return $this->success($data, 'Locations fetched successfully', 200);
     }
-
 }

@@ -1,18 +1,19 @@
 <?php
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Mail\ForgotPasswordOtp;
-use App\Mail\RegistationOtp;
-use App\Models\EmailOtp;
-use App\Models\User;
-use App\Traits\ApiResponse;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\EmailOtp;
+use App\Traits\ApiResponse;
+use App\Mail\RegistationOtp;
 use Illuminate\Http\Request;
+use App\Mail\ForgotPasswordOtp;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginController extends Controller
 {
@@ -36,7 +37,7 @@ class LoginController extends Controller
             ['user_id' => $user->id],
             [
                 'verification_code' => $code,
-                'expires_at'        => Carbon::now()->addMinutes(1),
+                'expires_at'        => Carbon::now()->addMinutes(5),
             ]
         );
 
@@ -73,30 +74,41 @@ class LoginController extends Controller
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-    public function userLogin(Request $request)
+     public function userLogin(Request $request)
     {
+        Log::info('Retrive all data:  '.json_encode($request->all()));
+
+
         $validator = Validator::make($request->all(), [
             'email'    => 'required|email|exists:users,email',
             'password' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return $this->error([], $validator->errors()->first(), 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         $credentials = $request->only('email', 'password');
 
         $userData = User::where('email', $request->email)->first();
-
+        
         if ($userData && Hash::check($request->password, $userData->password)) {
-
-            if (! $token = JWTAuth::attempt($credentials)) {
+            
+            if (!$token = JWTAuth::attempt($credentials)) {
                 return $this->error([], 'Invalid credentials', 401);
             }
-
             $userData = auth()->user();
-
+            
+            if ($request->has('device_token')) {
+                
+                Log::info('Device token:  '.$request->device_token);
+                
+                $userData->fcm_token = $request->device_token;
+            }
+            $userData->save();
             $userData->setAttribute('token', $token);
+
+            Log::info('User data:  '.json_encode($userData));
 
         } else {
             return $this->error([], 'Invalid credentials', 401);
@@ -258,6 +270,10 @@ class LoginController extends Controller
 
             $user->password = Hash::make($request->input('password'));
             $user->save();
+            
+            $token = JWTAuth::fromUser($user);
+            $user->setAttribute('token', $token);
+
 
             return $this->success($user, 'Password Reset successfully.', 200);
         } catch (\Exception $e) {

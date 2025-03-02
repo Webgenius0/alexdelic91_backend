@@ -25,11 +25,9 @@ class JobPostController extends Controller
             $jobpost = $this->JobPostRepositoryInterface->jobPost($request->validated());
 
             return $this->success($jobpost, 'Job post created successfully', 201);
-
         } catch (CustomException $e) {
 
             return $this->error([], $e->getMessage(), $e->getCode());
-
         } catch (\Exception $e) {
 
             return $this->error([], "An unexpected error occurred", 500);
@@ -38,15 +36,13 @@ class JobPostController extends Controller
 
     public function pastJobPost()
     {
-        try{
+        try {
 
             $jobpost = $this->JobPostRepositoryInterface->pastJobPost();
             return $this->success($jobpost, 'Past job post fetched successfully', 200);
-
         } catch (CustomException $e) {
 
             return $this->error([], $e->getMessage(), $e->getCode());
-
         } catch (\Exception $e) {
 
             return $this->error([], "An unexpected error occurred", 500);
@@ -55,19 +51,16 @@ class JobPostController extends Controller
 
     public function upcomingJobPost()
     {
-        try{
+        try {
             $jobpost = $this->JobPostRepositoryInterface->upcomingJobPost();
             return $this->success($jobpost, 'Upcoming job post fetched successfully', 200);
-
         } catch (CustomException $e) {
 
             return $this->error([], $e->getMessage(), $e->getCode());
-
         } catch (\Exception $e) {
 
             return $this->error([], "An unexpected error occurred", 500);
         }
-
     }
 
     public function jobPostDetails($id)
@@ -75,19 +68,17 @@ class JobPostController extends Controller
         try {
             $jobpost = $this->JobPostRepositoryInterface->jobPostDetails($id);
             return $this->success($jobpost, 'Job post details fetched successfully', 200);
-
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
         } catch (\Exception $e) {
 
             return $this->error([], "An unexpected error occurred", 500);
         }
-
     }
 
     public function reJobPost(JobPostRequest $request, $id)
     {
-        try{
+        try {
             $jobpost = $this->JobPostRepositoryInterface->reJobPost($request->validated(), $id);
             return $this->success($jobpost, 'Job post details fetched successfully', 200);
         } catch (CustomException $e) {
@@ -123,7 +114,7 @@ class JobPostController extends Controller
 
     public function singelJobPost($id)
     {
-        try{
+        try {
             $jobpost = $this->JobPostRepositoryInterface->singelJobPost($id);
             return $this->success($jobpost, 'Job post details fetched successfully', 200);
         } catch (CustomException $e) {

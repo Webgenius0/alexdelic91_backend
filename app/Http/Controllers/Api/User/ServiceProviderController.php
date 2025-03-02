@@ -13,16 +13,18 @@ use Illuminate\Support\Facades\Validator;
 class ServiceProviderController extends Controller
 {
     use ApiResponse;
-    
+
     public function myRating()
     {
         $user = auth()->user();
 
         if (!$user) {
-            return $this->error([], 'User Unauthorized', 404);
+            return $this->error([], 'User Unauthorized', 200);
         }
 
-        $data = Feedback::with('user')->whereHas('booking', function ($query) use ($user) { $query->where('service_provider_id', $user->id); })->get();
+        $data = Feedback::with('user')->whereHas('booking', function ($query) use ($user) {
+            $query->where('service_provider_id', $user->id);
+        })->get();
 
         if ($data->isEmpty()) {
             return $this->error([], 'No Feedback Found', 200);
@@ -41,11 +43,11 @@ class ServiceProviderController extends Controller
         if ($validator->fails()) {
             return $this->error([], $validator->errors(), 400);
         }
-        
+
         $user = auth()->user();
 
         if (! $user) {
-            return $this->error([], "User Unauthorized", 404);
+            return $this->error([], "User Unauthorized", 401);
         }
 
         $existingFeedback = Feedback::where('user_id', $user->id)
@@ -90,7 +92,7 @@ class ServiceProviderController extends Controller
         $user = auth()->user();
 
         if (!$user) {
-            return $this->error([], "User Unauthorized", 404);
+            return $this->error([], "User Unauthorized", 401);
         }
 
         if ($request->hasFile('avatar')) {
@@ -103,11 +105,11 @@ class ServiceProviderController extends Controller
             $image                        = $request->file('avatar');
             $imageName                    = uploadImage($image, 'user');
             $user->avatar = $imageName;
-        }else{
+        } else {
             $user->avatar = $user->avatar;
         }
 
-        try{
+        try {
             $user->update([
                 'name' => $request->name,
                 'avatar' => $user->avatar,
@@ -128,7 +130,7 @@ class ServiceProviderController extends Controller
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
                     $imageName = uploadImage($image, 'service/images');
-                   $images = ServiceProviderImage::create([
+                    $images = ServiceProviderImage::create([
                         'service_provider_id' => $profile->id,
                         'images' => $imageName,
                     ]);
@@ -142,8 +144,7 @@ class ServiceProviderController extends Controller
             if ($data) {
                 return $this->success($data, 'Profile updated successfully', 200);
             }
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }
     }
