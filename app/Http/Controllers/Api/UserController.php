@@ -53,9 +53,9 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:5120',
-            'email'  => 'required|email|unique:users,email,' . auth()->user()->id,
+            'email'  => 'nullable|email|unique:users,email,' . auth()->user()->id,
             'address' => 'nullable|string',
-            'name'    => 'required|string|max:255',
+            'name'    => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -155,24 +155,24 @@ class UserController extends Controller
         // dd($request->all());
         // Validation rules
         $validator = Validator::make($request->all(), [
-            'business_name' => 'required|string|max:255',
-            'category_id' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'phone' => 'required|numeric',
-            'service_location_id' => 'required',
-            'description' => 'required',
-            'city' => 'required|string|max:255',
-            'division' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:255',
-            'start_time' => 'required|string',
-            'end_time' => 'required|string',
+            'business_name' => 'nullable|string|max:255',
+            'category_id' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'phone' => 'nullable|numeric',
+            'service_location_id' => 'nullable',
+            'description' => 'nullable',
+            'city' => 'nullable|string|max:255',
+            'division' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:255',
+            'start_time' => 'nullable|string',
+            'end_time' => 'nullable|string',
             'images.*' => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
-            'subcategories' => 'required|array',
-            'subcategories.*' => 'required|integer',
-            'days' => 'required|array',
-            'days.*' => 'required|integer',
+            'subcategories' => 'nullable|array',
+            'subcategories.*' => 'nullable|integer',
+            'days' => 'nullable|array',
+            'days.*' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
