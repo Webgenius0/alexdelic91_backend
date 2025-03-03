@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('servise_provider_work_days', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_provider_id')->constrained('service_provider_profiles')->onDelete('cascade');
-            $table->foreignId('day_id')->constrained('days')->onDelete('cascade');
+            $table->foreignId('day_id')->nullable()->constrained('days')->onDelete('cascade');
             $table->timestamps();
         });
     }
