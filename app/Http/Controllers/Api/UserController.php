@@ -188,7 +188,10 @@ class UserController extends Controller
             DB::beginTransaction();
 
             // Create service provider profile
-            $service_provider = ServiceProviderProfile::updateOrCreate([
+            $service_provider = ServiceProviderProfile::updateOrCreate(
+                [
+                    'user_id' => $user->id
+                ],[
                 'user_id' => $user->id,
                 'business_name' => $request->business_name,
                 'category_id' => $request->category_id,
