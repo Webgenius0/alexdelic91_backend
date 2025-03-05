@@ -100,7 +100,7 @@ class BookingProviderRepository implements BookingProviderInterface
             ->get();
 
         if ($bookings->isEmpty()) {
-            throw new CustomException("No upcoming bookings found", 404);
+            throw new CustomException("No upcoming bookings found", 200);
         }
 
         return $bookings;
@@ -124,7 +124,7 @@ class BookingProviderRepository implements BookingProviderInterface
             ->first();
 
         if (!$booking) {
-            throw new CustomException("Booking not found", 404);
+            throw new CustomException("Booking not found", 200);
         }
 
         return $booking;

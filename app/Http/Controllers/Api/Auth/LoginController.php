@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\Auth;
 
 use Carbon\Carbon;
@@ -123,7 +124,6 @@ class LoginController extends Controller
             }
         } else {
             $flags = true;
-
         }
 
         $data = [
@@ -149,7 +149,7 @@ class LoginController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         try {
@@ -179,7 +179,7 @@ class LoginController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         try {
@@ -210,7 +210,7 @@ class LoginController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         try {
@@ -261,7 +261,7 @@ class LoginController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         try {
@@ -270,7 +270,7 @@ class LoginController extends Controller
 
             $user->password = Hash::make($request->input('password'));
             $user->save();
-            
+
             $token = JWTAuth::fromUser($user);
             $user->setAttribute('token', $token);
 
