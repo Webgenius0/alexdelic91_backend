@@ -238,7 +238,7 @@ class UserController extends Controller
                     ]);
                 }
             }
-
+            $service_provider->load(['subCategories', 'workingDays', 'serviceProviderImage']);
             DB::commit();
             return $this->success($service_provider, 'Service Provider created successfully', 200);
         } catch (\Exception $e) {
