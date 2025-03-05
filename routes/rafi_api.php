@@ -20,7 +20,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     // Help Center
 
     Route::controller(HelpCenterController::class)->group(function() {
-        Route::post('/request-for-help','requestForHelp');
+        Route::post('request-for-help','requestForHelp');
     });
 
     // Provider 
