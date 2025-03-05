@@ -18,8 +18,6 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('cascade');
             $table->string('phone', 50)->nullable();
             $table->string('address', 255)->nullable();
-            $table->string('latitude', 255)->nullable();
-            $table->string('longitude', 255)->nullable();
             $table->foreignId('service_location_id')->nullable()->constrained('service_locations')->onDelete('cascade'); 
             $table->text('description')->nullable();
             $table->string('city', 100)->nullable();

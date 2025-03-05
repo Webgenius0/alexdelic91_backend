@@ -158,8 +158,6 @@ class UserController extends Controller
             'business_name' => 'nullable|string|max:255',
             'category_id' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
             'phone' => 'nullable|numeric',
             'service_location_id' => 'nullable',
             'description' => 'nullable',
@@ -196,8 +194,6 @@ class UserController extends Controller
                 'business_name' => $request->business_name,
                 'category_id' => $request->category_id,
                 'address' => $request->address,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
                 'phone' => $request->phone,
                 'service_location_id' => $request->service_location_id,
                 'description' => $request->description,
@@ -263,5 +259,17 @@ class UserController extends Controller
             return $this->error([], 'Locations not found', 200);
         }
         return $this->success($data, 'Locations fetched successfully', 200);
+    }
+
+    public function updateLatAndLng(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $this->error([], 'User not found', 200);
+        }
+        $user->latitude = $request->latitude;
+        $user->longitude = $request->longitude;
+        $user->save();
+        return $this->success($user, 'Location updated successfully', 200);
     }
 }

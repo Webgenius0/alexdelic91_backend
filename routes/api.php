@@ -64,6 +64,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::post('/service/provider/profile/create','create');
         Route::get('/days', 'getDays');
         Route::get('/service/location', 'getLocation');
+        Route::post('/lat-and-lng/update', 'updateLatAndLng');
     });
 
     Route::controller(NotificationController::class)->group(function () {
