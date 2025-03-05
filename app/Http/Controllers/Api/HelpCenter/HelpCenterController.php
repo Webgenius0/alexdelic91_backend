@@ -16,7 +16,6 @@ class HelpCenterController extends Controller
     use ApiResponse;
 
     public function requestForHelp(Request $request) {
-        
         $validatedData = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|email',
@@ -41,6 +40,10 @@ class HelpCenterController extends Controller
         ]);
 
         $adminEmail = User::where('role', 'admin')->first()->email;
+
+        if($adminEmail == "admin@admin.com") {
+            $adminEmail = config('app.testing_to_mail');
+        }
 
         Mail::to($adminEmail)->send(new HelpCenterMail($data));
 
