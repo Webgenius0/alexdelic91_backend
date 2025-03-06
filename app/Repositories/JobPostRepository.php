@@ -83,7 +83,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->where('user_id', $user->id)
             ->whereNot('status', 'deleted')
             ->whereHas('jobPostDates', function ($query) {
-                $query->whereDate('date', '<', now()); 
+                $query->whereDate('date', '<', now());
             })
             ->get();
         if ($job->isEmpty()) {
@@ -101,7 +101,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             throw new CustomException("User Unauthorized", 401);
         }
 
-        $job = JobPost::with([
+        $jobs = JobPost::with([
             'jobPostDates',
             'category:id,category_name',
             'subcategory:id,subcategory_name',
@@ -109,14 +109,16 @@ class JobPostRepository implements JobPostRepositoryInterface
         ])
             ->where('user_id', $user->id)
             ->whereNot('status', 'deleted')
-            ->whereDate('created_at', '>=', now())
+            ->whereHas('jobPostDates', function ($query) {
+                $query->whereDate('date', '>=', now());
+            })
             ->get();
 
-        if (! $job) {
-            throw new CustomException("Job post not found", 200);
+        if ($jobs->isEmpty()) {
+            throw new CustomException("Job post not found", 404);
         }
 
-        return $job;
+        return $jobs;
     }
 
     public function jobPostDetails($id)
@@ -190,10 +192,10 @@ class JobPostRepository implements JobPostRepositoryInterface
         }
 
         $job = JobPost::where('user_id', $user->id)
-                    ->whereHas('jobPostDates', function ($query) {
-                        $query->whereDate('date', '<', now()); 
-                    })
-                    ->update(['status' => 'deleted']);
+            ->whereHas('jobPostDates', function ($query) {
+                $query->whereDate('date', '<', now());
+            })
+            ->update(['status' => 'deleted']);
         if (! $job) {
             throw new CustomException("Data not found", 200);
         }
