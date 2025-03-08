@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Feedback;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -14,49 +14,36 @@ class FeedBackController extends Controller
 
     public function store(Request $request, $id)
     {
-
         $validator = Validator::make($request->all(), [
             'feedback' => 'nullable|string',
             'rating'   => 'required|numeric|min:1|max:5',
         ]);
 
-
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
-
 
         $user = auth()->user();
 
-
-        if (!$user) {
+        if (! $user) {
             return $this->error([], "User Unauthorized", 401);
         }
+        
+        $booking = Booking::where('job_post_id', $id)->where('user_id', $user->id)->first();
 
-
-        $existingFeedback = Feedback::where('user_id', $user->id)
-            ->where('booking_id', $id)
-            ->first();
-
-        if ($existingFeedback) {
-            return $this->error($existingFeedback, "Feedback Already Given", 200);
-        } else {
-
-            $data = Feedback::create([
-                'user_id'    => $user->id,
-                'booking_id' => $id,
-                'rating'     => $request->rating,
-                'feedback'   => $request->feedback,
-            ]);
-
-            if (!$data) {
-                return $this->error([], "Something went wrong", 500);
-            }
-
-            return $this->success($data, "Feedback Added Successfully", 200);
+        if (! $booking) {
+            return $this->error([], "not found", 404);
         }
-    }
 
+        $data = Feedback::create([
+            'booking_id' => $booking->id,
+            'user_id'    => $user->id,
+            'feedback'   => $request->feedback,
+            'rating'     => $request->rating,
+        ]);
+
+        return $this->success($data, "Feedback created successfully", 200);
+    }
 
     public function getFeedback()
     {
@@ -67,12 +54,12 @@ class FeedBackController extends Controller
         }
 
         $data = Feedback::with([
-            'booking' => function ($query) {
+            'booking'                 => function ($query) {
                 $query->select('id', 'user_id', 'service_provider_id');
             },
             'booking.serviceProvider' => function ($query) {
                 $query->select('id', 'name');
-            }
+            },
         ])
             ->where('user_id', $user->id)
             ->get()

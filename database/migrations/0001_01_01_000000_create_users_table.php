@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['admin', 'user', 'service_provider'])->default('user');
             $table->string('address')->nullable();
+            $table->string('latitude', 255)->nullable();
+            $table->string('longitude', 255)->nullable();
             $table->string('avatar')->nullable();
             $table->string('provider')->nullable(); // Field to store social provider name (e.g., 'google', 'facebook')
             $table->string('provider_id')->nullable(); // Field to store the unique ID from the social provider

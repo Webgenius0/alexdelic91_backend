@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('servise_provider_work_days', function (Blueprint $table) {
+        Schema::create('banners', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_provider_id')->constrained('service_provider_profiles')->onDelete('cascade');
-            $table->foreignId('day_id')->nullable()->constrained('days')->onDelete('cascade');
+            $table->string('image_url');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('servise_provider_work_days');
+        Schema::dropIfExists('banners');
     }
 };

@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Notifications\NewNotification;
 use Illuminate\Support\Facades\Validator;
 
-class RegisterController extends Controller {
+class RegisterController extends Controller
+{
 
     use ApiResponse;
 
@@ -27,7 +28,8 @@ class RegisterController extends Controller {
      * @return void
      */
 
-    private function sendOtp($user) {
+    private function sendOtp($user)
+    {
         $code = rand(1000, 9999);
 
         // Store verification code in the database
@@ -49,7 +51,8 @@ class RegisterController extends Controller {
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-    public function userRegister(Request $request) {
+    public function userRegister(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'name'           => 'required|string|max:255',
@@ -86,16 +89,16 @@ class RegisterController extends Controller {
             $user->notify(new NewNotification(
                 message: 'Your account has been created successfully.',
                 channels: ['database'],
-                type : NotificationType::SUCCESS,
+                type: NotificationType::SUCCESS,
             ));
 
-            if($user->role == 'service_provider') {
-                if($user->serviceProviderProfile != null){
+            if ($user->role == 'service_provider') {
+                if ($user->serviceProviderProfile != null) {
                     $flags = true;
-                }else{
+                } else {
                     $flags = false;
                 }
-            }else{
+            } else {
                 $flags = true;
             }
 
@@ -124,7 +127,8 @@ class RegisterController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function otpVerify(Request $request) {
+    public function otpVerify(Request $request)
+    {
 
         // Validate the request
         $validator = Validator::make($request->all(), [
@@ -133,7 +137,7 @@ class RegisterController extends Controller {
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         try {
@@ -141,9 +145,9 @@ class RegisterController extends Controller {
             $user = User::where('email', $request->input('email'))->first();
 
             $verification = EmailOtp::where('user_id', $user->id)
-            ->where('verification_code', $request->input('otp'))
-            ->where('expires_at', '>', Carbon::now())
-            ->first();
+                ->where('verification_code', $request->input('otp'))
+                ->where('expires_at', '>', Carbon::now())
+                ->first();
 
 
             if ($verification) {
@@ -174,14 +178,15 @@ class RegisterController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
 
-    public function otpResend(Request $request) {
+    public function otpResend(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         try {

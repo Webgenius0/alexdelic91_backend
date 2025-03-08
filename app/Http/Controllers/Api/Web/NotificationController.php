@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\Api\Web;
 
-use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Traits\ApiResponse;
 
 class NotificationController extends Controller
 {
@@ -15,7 +13,10 @@ class NotificationController extends Controller
     {
         $user = auth()->user();
 
-        $data = $user->notifications()->select('id', 'data', 'read_at')->latest()->get();
+        $data = $user->notifications()
+            ->select('id', 'data', 'read_at', 'created_at')
+            ->latest()
+            ->get();
 
         if ($data->isEmpty()) {
             return $this->error([], 'No Notifications Found', 200);

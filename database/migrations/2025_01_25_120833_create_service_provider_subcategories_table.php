@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('service_provider_subcategories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_provider_id')->constrained('service_provider_profiles')->onDelete('cascade');
-            $table->foreignId('subcategory_id')->constrained('subcategories')->onDelete('cascade');
+            $table->foreignId('subcategory_id')->nullable()->constrained('subcategories')->onDelete('cascade');
             $table->timestamps();
         });
     }
