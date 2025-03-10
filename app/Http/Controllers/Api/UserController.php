@@ -32,7 +32,7 @@ class UserController extends Controller
 
         $user = auth()->user();
 
-        $data = User::with('serviceProviderProfile.serviceProviderImage', 'serviceProviderProfile.workingDays')->where('id', $user->id)->first();
+        $data = User::with('serviceProviderProfile.serviceProviderImage', 'serviceProviderProfile.workingDays', 'serviceProviderProfile.subCategories')->where('id', $user->id)->first();
 
         if (!$data) {
             return $this->error([], 'User Not Found', 200);
@@ -53,9 +53,9 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:5120',
-            'email'  => 'required|email|unique:users,email,' . auth()->user()->id,
+            'email'  => 'nullable|email|unique:users,email,' . auth()->user()->id,
             'address' => 'nullable|string',
-            'name'    => 'required|string|max:255',
+            'name'    => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -155,24 +155,24 @@ class UserController extends Controller
         // dd($request->all());
         // Validation rules
         $validator = Validator::make($request->all(), [
-            'business_name' => 'required|string|max:255',
-            'category_id' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'phone' => 'required|numeric',
-            'service_location_id' => 'required',
-            'description' => 'required',
-            'city' => 'required|string|max:255',
-            'division' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:255',
-            'start_time' => 'required|string',
-            'end_time' => 'required|string',
+            'business_name' => 'nullable|string|max:255',
+            'category_id' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'latitude' => 'nullable',
+            'longitude' => 'nullable',
+            'phone' => 'nullable|numeric',
+            'service_location_id' => 'nullable',
+            'description' => 'nullable',
+            'city' => 'nullable|string|max:255',
+            'division' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:255',
+            'start_time' => 'nullable|string',
+            'end_time' => 'nullable|string',
             'images.*' => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
-            'subcategories' => 'required|array',
-            'subcategories.*' => 'required|integer',
-            'days' => 'required|array',
-            'days.*' => 'required|integer',
+            'subcategories' => 'nullable|array',
+            'subcategories.*' => 'nullable|integer',
+            'days' => 'nullable|array',
+            'days.*' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
@@ -188,7 +188,10 @@ class UserController extends Controller
             DB::beginTransaction();
 
             // Create service provider profile
-            $service_provider = ServiceProviderProfile::create([
+            $service_provider = ServiceProviderProfile::updateOrCreate(
+                [
+                    'user_id' => $user->id
+                ],[
                 'user_id' => $user->id,
                 'business_name' => $request->business_name,
                 'category_id' => $request->category_id,
@@ -235,7 +238,7 @@ class UserController extends Controller
                     ]);
                 }
             }
-
+            $service_provider->load(['subCategories', 'workingDays', 'serviceProviderImage']);
             DB::commit();
             return $this->success($service_provider, 'Service Provider created successfully', 200);
         } catch (\Exception $e) {
@@ -260,5 +263,17 @@ class UserController extends Controller
             return $this->error([], 'Locations not found', 200);
         }
         return $this->success($data, 'Locations fetched successfully', 200);
+    }
+
+    public function updateLatAndLng(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $this->error([], 'User not found', 200);
+        }
+        $user->latitude = $request->latitude;
+        $user->longitude = $request->longitude;
+        $user->save();
+        return $this->success($user, 'Location updated successfully', 200);
     }
 }

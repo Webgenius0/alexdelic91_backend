@@ -57,7 +57,7 @@
 
         <div class="code">{{ $code }}</div>
 
-        <p>This OTP code is valid for 1 minutes. For security reasons, please do not share this code with anyone.</p>
+        <p>This OTP code is valid for 15 minutes. For security reasons, please do not share this code with anyone.</p>
 
         <p>If you did not request a password reset, please ignore this email. If you need further assistance, contact
             our support team.</p>

@@ -1,21 +1,16 @@
 <?php
-
-use App\Http\Controllers\Web\NotificationController;
-use App\Models\DynamicPage;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\NotificationController;
+use App\Http\Controllers\Web\Frontend\PageController;
 
 require __DIR__.'/auth.php';
 
-Route::get('/privacy-policy', function () {
-    $privacyPolicy = DynamicPage::where('id', 1)->first();
-    return response()->json($privacyPolicy);
+Route::get('/page/privacy-and-policy', [PageController::class, 'privacyAndPolicy'])->name('dynamicPage.privacyAndPolicy');
+
+Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'])->name('dynamicPage.termsAndConditions');
+
+Route::controller(NotificationController::class)->group(function () {
+    Route::get('/send-notifications', 'sendNotifications');
+
 });
 
-Route::get('/terms-and-conditions', function () {
-    $termsAndConditions = DynamicPage::where('id', 2)->first();
-    return response()->json($termsAndConditions);
-});
-
-Route::get('/test', [NotificationController::class, 'test_firebase']);
-
-Route::post('/store_fcm', [NotificationController::class, 'store_fcm']);

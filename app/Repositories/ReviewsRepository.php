@@ -34,6 +34,9 @@ class ReviewsRepository implements ReviewsInterface
             case 'unpopular_reviews':
                 $data = Feedback::where('rating', 1)->with(['user', 'serviceProvider', 'booking'])->get();
                 break;
+            case 'oldest_reviews':
+                $data = Feedback::orderBy('created_at', 'asc')->with(['user', 'serviceProvider', 'booking'])->get();
+                break;
             default:
                 $data = Feedback::with(['user', 'serviceProvider', 'booking'])->get();
                 break;

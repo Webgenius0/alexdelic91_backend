@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Mail\ForgotPasswordOtp;
-use App\Mail\RegistationOtp;
-use App\Models\EmailOtp;
-use App\Models\User;
-use App\Traits\ApiResponse;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\EmailOtp;
+use App\Traits\ApiResponse;
+use App\Mail\RegistationOtp;
 use Illuminate\Http\Request;
+use App\Mail\ForgotPasswordOtp;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginController extends Controller
 {
@@ -94,10 +95,18 @@ class LoginController extends Controller
             if (!$token = JWTAuth::attempt($credentials)) {
                 return $this->error([], 'Invalid credentials', 401);
             }
-
             $userData = auth()->user();
 
+            if ($request->has('device_token')) {
+
+                Log::info('Device token:  ' . $request->device_token);
+
+                $userData->fcm_token = $request->device_token;
+            }
+            $userData->save();
             $userData->setAttribute('token', $token);
+
+            Log::info('User data:  ' . json_encode($userData));
         } else {
             return $this->error([], 'Invalid credentials', 401);
         }

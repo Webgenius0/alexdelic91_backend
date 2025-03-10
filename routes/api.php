@@ -53,7 +53,7 @@ Route::controller(LoginController::class)->prefix('users/login')->group(function
     Route::post('/reset-password', 'resetPassword');
 });
 
-Route::group(['middleware' => ['jwt.verify']], function() {
+Route::group(['middleware' => ['jwt.verify']], function () {
 
     Route::controller(UserController::class)->prefix('users')->group(function () {
         Route::get('/data', 'userData');
@@ -61,15 +61,13 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::post('/logout', 'logoutUser');
         Route::delete('/delete', 'deleteUser');
 
-        Route::post('/service/provider/profile/create','create');
+        Route::post('/service/provider/profile/create', 'create');
         Route::get('/days', 'getDays');
         Route::get('/service/location', 'getLocation');
+        Route::post('/lat-and-lng/update', 'updateLatAndLng');
     });
 
     Route::controller(NotificationController::class)->group(function () {
         Route::get('/notifications', 'getNotifications');
     });
-    
 });
-
-

@@ -43,6 +43,10 @@ class HelpCenterController extends Controller
 
         $adminEmail = User::where('role', 'admin')->first()->email;
 
+        if ($adminEmail == "admin@admin.com") {
+            $adminEmail = config('app.testing_to_mail');
+        }
+
         Mail::to($adminEmail)->send(new HelpCenterMail($data));
 
         return $this->success($data, 'Help request sent successfully', 201);

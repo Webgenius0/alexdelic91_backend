@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\User\BookMarkController;
 use App\Http\Controllers\Api\User\FeedBackController;
 use App\Http\Controllers\Api\User\ServiceProviderController;
 use App\Http\Controllers\Api\Web\FaqController;
+use App\Http\Controllers\Api\Web\Job\JobAcceptController;
 
 Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group(['middleware' => ['customer']], function() {
@@ -50,6 +51,10 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::controller(JobPostController::class)->group(function () {
             Route::get('/job-post-list', 'getJobPost');
             Route::get('/singel-job-post/{id}', 'singelJobPost');
+        });
+
+        Route::controller(JobAcceptController::class)->group(function () {
+            Route::post('/job-accept/{id}', 'jobAccept');
         });
     });
 
