@@ -115,7 +115,7 @@ class JobPostRepository implements JobPostRepositoryInterface
             ->get();
 
         if ($jobs->isEmpty()) {
-            throw new CustomException("Job post not found", 404);
+            throw new CustomException("Job post not found", 200);
         }
 
         return $jobs;
