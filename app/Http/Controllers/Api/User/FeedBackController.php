@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
@@ -28,7 +29,7 @@ class FeedBackController extends Controller
         if (! $user) {
             return $this->error([], "User Unauthorized", 401);
         }
-        
+
         $booking = Booking::where('job_post_id', $id)->where('user_id', $user->id)->first();
 
         if (! $booking) {

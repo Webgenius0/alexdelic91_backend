@@ -75,11 +75,8 @@ class LoginController extends Controller
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-     public function userLogin(Request $request)
+    public function userLogin(Request $request)
     {
-        Log::info('Retrive all data:  '.json_encode($request->all()));
-
-
         $validator = Validator::make($request->all(), [
             'email'    => 'required|email|exists:users,email',
             'password' => 'required',
@@ -92,25 +89,24 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         $userData = User::where('email', $request->email)->first();
-        
+
         if ($userData && Hash::check($request->password, $userData->password)) {
-            
+
             if (!$token = JWTAuth::attempt($credentials)) {
                 return $this->error([], 'Invalid credentials', 401);
             }
             $userData = auth()->user();
-            
+
             if ($request->has('device_token')) {
-                
-                Log::info('Device token:  '.$request->device_token);
-                
+
+                Log::info('Device token:  ' . $request->device_token);
+
                 $userData->fcm_token = $request->device_token;
             }
             $userData->save();
             $userData->setAttribute('token', $token);
 
-            Log::info('User data:  '.json_encode($userData));
-
+            Log::info('User data:  ' . json_encode($userData));
         } else {
             return $this->error([], 'Invalid credentials', 401);
         }

@@ -43,7 +43,7 @@ class HelpCenterController extends Controller
 
         $adminEmail = User::where('role', 'admin')->first()->email;
 
-        if($adminEmail == "admin@admin.com") {
+        if ($adminEmail == "admin@admin.com") {
             $adminEmail = config('app.testing_to_mail');
         }
 

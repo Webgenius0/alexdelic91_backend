@@ -11,6 +11,6 @@ Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'
 
 Route::controller(NotificationController::class)->group(function () {
     Route::get('/send-notifications', 'sendNotifications');
-   
+
 });
 
