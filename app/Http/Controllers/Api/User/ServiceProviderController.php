@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\ProviderReview;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceProviderImage;
+use App\Models\ServiseProviderWorkDay;
+use Google\Service\MigrationCenterAPI\PayloadFile;
 use Illuminate\Support\Facades\Validator;
 
 class ServiceProviderController extends Controller
@@ -146,6 +148,49 @@ class ServiceProviderController extends Controller
             }
         } catch (\Exception $e) {
             return $this->error([], $e->getMessage(), 500);
+        }
+    }
+
+    public function myAvailability(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'days' => 'nullable|array',
+            'days.*' => 'nullable|integer',
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error([], $validator->errors(), 400);
+        }
+        $user = auth()->user();
+
+        if (!$user) {
+            return $this->error([], "User Unauthorized", 401);
+        }
+
+        $data = $user->serviceProviderProfile()->first();
+
+        // dd($data);
+
+        // Handle workdays
+        if (is_array($request->days)) {
+            foreach ($request->days as $day_id) {
+                ServiseProviderWorkDay::create([
+                    'service_provider_id' => $user->id,
+                    'day_id' => $day_id,
+                ]);
+            }
+        }
+
+        $data->start_time = $request->start_time;
+        $data->end_time = $request->end_time;
+        $data->save();
+
+        $data->load(['workingDays']);
+
+        if ($data) {
+            return $this->success($data, 'Availability fetched successfully', 200);
         }
     }
 }

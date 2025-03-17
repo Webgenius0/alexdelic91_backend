@@ -45,6 +45,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::post('/my-rating/{id}', 'store');
 
             Route::post('/profile/update', 'updateProfile');
+            Route::post('/my-availability', 'myAvailability');
         });
 
         //job post route--------
