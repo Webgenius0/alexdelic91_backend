@@ -318,7 +318,7 @@ class BookingProviderRepository implements BookingProviderInterface
             'serviceProvider:id',
             'serviceProvider.serviceProviderProfile:id,user_id,category_id',
             'serviceProvider.serviceProviderProfile.category:id,category_name',
-            'feedback'
+            'feedback.user:id,name,avatar'
         ])
             ->where('service_provider_id', $user->id)
             ->where('id', $id)
