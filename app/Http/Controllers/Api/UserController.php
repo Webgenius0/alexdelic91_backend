@@ -1,21 +1,22 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Day;
+use App\Models\OtherCategory;
+use App\Models\ServiceLocation;
+use App\Models\ServiceProviderImage;
+use App\Models\ServiceProviderProfile;
+use App\Models\ServiceProviderSubcategory;
+use App\Models\ServiseProviderWorkDay;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use App\Models\ServiceLocation;
-use Illuminate\Support\Facades\DB;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use App\Http\Controllers\Controller;
-use App\Models\ServiceProviderImage;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ServiceProviderProfile;
-use App\Models\ServiseProviderWorkDay;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\Models\ServiceProviderSubcategory;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
 {
@@ -34,7 +35,7 @@ class UserController extends Controller
 
         $data = User::with('serviceProviderProfile.serviceProviderImage', 'serviceProviderProfile.workingDays', 'serviceProviderProfile.subCategories')->where('id', $user->id)->first();
 
-        if (!$data) {
+        if (! $data) {
             return $this->error([], 'User Not Found', 200);
         }
 
@@ -53,7 +54,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:5120',
-            'email'  => 'nullable|email|unique:users,email,' . auth()->user()->id,
+            'email'   => 'nullable|email|unique:users,email,' . auth()->user()->id,
             'address' => 'nullable|string',
             'name'    => 'nullable|string|max:255',
         ]);
@@ -67,7 +68,7 @@ class UserController extends Controller
             $user = auth()->user();
 
             // If user is not found, return an error response
-            if (!$user) {
+            if (! $user) {
                 return $this->error([], "User Not Found", 200);
             }
 
@@ -129,7 +130,7 @@ class UserController extends Controller
             $user = auth()->user();
 
             // If user is not found, return an error response
-            if (!$user) {
+            if (! $user) {
                 return $this->error([], "User Not Found", 200);
             }
 
@@ -155,24 +156,24 @@ class UserController extends Controller
         // dd($request->all());
         // Validation rules
         $validator = Validator::make($request->all(), [
-            'business_name' => 'nullable|string|max:255',
-            'category_id' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'latitude' => 'nullable',
-            'longitude' => 'nullable',
-            'phone' => 'nullable|numeric',
+            'business_name'       => 'nullable|string|max:255',
+            'category_id'         => 'nullable|string|max:255',
+            'address'             => 'nullable|string|max:255',
+            'latitude'            => 'nullable',
+            'longitude'           => 'nullable',
+            'phone'               => 'nullable|numeric',
             'service_location_id' => 'nullable',
-            'description' => 'nullable',
-            'city' => 'nullable|string|max:255',
-            'division' => 'nullable|string|max:255',
-            'zip_code' => 'nullable|string|max:255',
-            'start_time' => 'nullable|string',
-            'end_time' => 'nullable|string',
-            'images.*' => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
-            'subcategories' => 'nullable|array',
-            'subcategories.*' => 'nullable|integer',
-            'days' => 'nullable|array',
-            'days.*' => 'nullable|integer',
+            'description'         => 'nullable',
+            'city'                => 'nullable|string|max:255',
+            'division'            => 'nullable|string|max:255',
+            'zip_code'            => 'nullable|string|max:255',
+            'start_time'          => 'nullable|string',
+            'end_time'            => 'nullable|string',
+            'images.*'            => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
+            'subcategories'       => 'nullable|array',
+            'subcategories.*'     => 'nullable|integer',
+            'days'                => 'nullable|array',
+            'days.*'              => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
@@ -180,7 +181,7 @@ class UserController extends Controller
         }
 
         $user = Auth::user(); // Get the authenticated user
-        if (!$user) {
+        if (! $user) {
             return $this->error([], "User Not Found", 200);
         }
 
@@ -190,31 +191,41 @@ class UserController extends Controller
             // Create service provider profile
             $service_provider = ServiceProviderProfile::updateOrCreate(
                 [
-                    'user_id' => $user->id
-                ],[
-                'user_id' => $user->id,
-                'business_name' => $request->business_name,
-                'category_id' => $request->category_id,
-                'address' => $request->address,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'phone' => $request->phone,
-                'service_location_id' => $request->service_location_id,
-                'description' => $request->description,
-                'city' => $request->city,
-                'division' => $request->division,
-                'zip_code' => $request->zip_code,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
-            ]);
+                    'user_id' => $user->id,
+                ], [
+                    'user_id'             => $user->id,
+                    'business_name'       => $request->business_name,
+                    'category_id'         => $request->category_id,
+                    'address'             => $request->address,
+                    'latitude'            => $request->latitude,
+                    'longitude'           => $request->longitude,
+                    'phone'               => $request->phone,
+                    'service_location_id' => $request->service_location_id,
+                    'description'         => $request->description,
+                    'city'                => $request->city,
+                    'division'            => $request->division,
+                    'zip_code'            => $request->zip_code,
+                    'start_time'          => $request->start_time,
+                    'end_time'            => $request->end_time,
+                ]);
 
+            $category = Category::find($request->category_id);
+
+            if ($category && in_array(strtolower($category->category_name), ['others', 'other'])) {
+                OtherCategory::create([
+                    'service_provider_profile_id' => $service_provider->id,
+                    'category_id'         => $category->id,
+                    'category_name'       => $category->category_name,
+                    'status'              => 'inactive',
+                ]);
+            }
             // Handle gallery images
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
                     $imageName = uploadImage($image, 'service/images');
                     ServiceProviderImage::create([
                         'service_provider_id' => $service_provider->id,
-                        'images' => $imageName,
+                        'images'              => $imageName,
                     ]);
                 }
             }
@@ -224,7 +235,7 @@ class UserController extends Controller
                 foreach ($request->subcategories as $subcategory_id) {
                     ServiceProviderSubcategory::create([
                         'service_provider_id' => $service_provider->id,
-                        'subcategory_id' => $subcategory_id,
+                        'subcategory_id'      => $subcategory_id,
                     ]);
                 }
             }
@@ -234,7 +245,7 @@ class UserController extends Controller
                 foreach ($request->days as $day_id) {
                     ServiseProviderWorkDay::create([
                         'service_provider_id' => $service_provider->id,
-                        'day_id' => $day_id,
+                        'day_id'              => $day_id,
                     ]);
                 }
             }
@@ -250,7 +261,7 @@ class UserController extends Controller
     public function getDays()
     {
         $days = Day::all();
-        if (!$days) {
+        if (! $days) {
             return $this->error([], 'Days not found', 200);
         }
         return $this->success($days, 'Days fetched successfully', 200);
@@ -259,7 +270,7 @@ class UserController extends Controller
     public function getLocation()
     {
         $data = ServiceLocation::all();
-        if (!$data) {
+        if (! $data) {
             return $this->error([], 'Locations not found', 200);
         }
         return $this->success($data, 'Locations fetched successfully', 200);
@@ -268,10 +279,10 @@ class UserController extends Controller
     public function updateLatAndLng(Request $request)
     {
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             return $this->error([], 'User not found', 200);
         }
-        $user->latitude = $request->latitude;
+        $user->latitude  = $request->latitude;
         $user->longitude = $request->longitude;
         $user->save();
         return $this->success($user, 'Location updated successfully', 200);

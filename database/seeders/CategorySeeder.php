@@ -39,6 +39,12 @@ class CategorySeeder extends Seeder
                 'icon' => 'backend/images/Vector.png',
                 'status' => 'active',
             ],
+            [
+                'category_name' => 'other',
+                'category_slug' => Str::slug('other'),
+                'icon' => 'backend/images/Vector.png',
+                'status' => 'active',
+            ],
         ]);
     }
 }

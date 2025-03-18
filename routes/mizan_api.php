@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\Job\JobPostController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Web\FaqController;
+use App\Http\Controllers\Api\Job\JobPostController;
 use App\Http\Controllers\Api\User\BookMarkController;
 use App\Http\Controllers\Api\User\FeedBackController;
-use App\Http\Controllers\Api\User\ServiceProviderController;
-use App\Http\Controllers\Api\Web\FaqController;
 use App\Http\Controllers\Api\Web\Job\JobAcceptController;
+use App\Http\Controllers\Api\User\ServiceProviderController;
+use App\Http\Controllers\Api\Provider\NotificationSettingController;
 
 Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group(['middleware' => ['customer']], function() {
@@ -56,6 +57,10 @@ Route::group(['middleware' => ['jwt.verify']], function () {
 
         Route::controller(JobAcceptController::class)->group(function () {
             Route::post('/job-accept/{id}', 'jobAccept');
+        });
+
+        Route::controller(NotificationSettingController::class)->group(function () {
+            Route::post('/notifications-setting', 'notificationsSetting');
         });
     });
 

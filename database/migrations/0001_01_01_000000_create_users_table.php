@@ -26,6 +26,10 @@ return new class extends Migration
             $table->string('provider_id')->nullable(); // Field to store the unique ID from the social provider
             $table->boolean('agree_to_terms')->default(false); // Field to store agreement to terms
             $table->text('fcm_token')->nullable();
+            $table->boolean('is_notices')->default(true);
+            $table->boolean('is_messages')->default(true);
+            $table->boolean('is_likes')->default(true);
+            $table->boolean('safety_mode')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

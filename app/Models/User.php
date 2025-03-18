@@ -66,6 +66,10 @@ class User extends Authenticatable implements JWTSubject
             'agree_to_terms'    => 'boolean',
             'is_premium'        => 'boolean',
             'id'                => 'integer',
+            'is_notices'        => 'boolean',
+            'is_messages'       => 'boolean',
+            'is_likes'          => 'boolean',
+            'safety_mode'       => 'boolean',
         ];
     }
 
