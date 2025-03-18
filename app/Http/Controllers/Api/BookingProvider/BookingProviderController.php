@@ -173,6 +173,19 @@ class BookingProviderController extends Controller
         }
     }
 
+    public function deleteProviderBookingsHistory()
+    {
+        try {
+            $bookings = $this->bookingProviderInterface->deleteProviderBookingsHistory();
+
+            return $this->success($bookings, 'Provider bookings history deleted successfully', 200);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage(), "An unexpected error occurred", 500);
+        }
+    }
+
     public function providerWithRatingSingle($id)
     {
         try {
