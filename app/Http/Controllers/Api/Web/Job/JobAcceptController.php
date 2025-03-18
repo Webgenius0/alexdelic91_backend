@@ -6,7 +6,9 @@ use App\Models\Booking;
 use App\Models\JobPost;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use App\Enum\NotificationType;
 use App\Http\Controllers\Controller;
+use App\Notifications\NewNotification;
 use Illuminate\Support\Facades\Validator;
 
 class JobAcceptController extends Controller
@@ -53,6 +55,12 @@ class JobAcceptController extends Controller
         $job->update([
             'status' => 'booked',
         ]);
+
+        $data->user->notify(new NewNotification(
+            message: 'Your job has been accepted',
+            channels: ['database'],
+            type: NotificationType::SUCCESS,
+        ));
 
         return $this->success($data, 'Job accepted successfully', 200);
     }

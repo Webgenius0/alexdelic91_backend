@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api\BookingProvider;
 
+use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
+use App\Enum\NotificationType;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingRequest;
+use App\Notifications\NewNotification;
 use App\Interface\BookingProviderInterface;
-use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 
 class BookingProviderController extends Controller
 {
@@ -27,7 +29,11 @@ class BookingProviderController extends Controller
     {
         try {
             $booking = $this->bookingProviderInterface->book($request->validated());
-
+            $booking->serviceProvider->notify(new NewNotification(
+                message: 'You have a new booking',
+                channels: ['database'],
+                type: NotificationType::SUCCESS,
+            ));
             return $this->success($booking, 'Booking created successfully', 201);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
@@ -107,6 +113,13 @@ class BookingProviderController extends Controller
             $booking = $this->bookingProviderInterface->cancel($id);
 
             return $this->success($booking, 'Booking cancelled successfully', 200);
+
+            $booking->user->notify(new NewNotification(
+                message: 'Your booking has been cancelled',
+                channels: ['database'],
+                type: NotificationType::SUCCESS,
+            ));
+
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
         } catch (\Exception $e) {
@@ -120,6 +133,13 @@ class BookingProviderController extends Controller
             $booking = $this->bookingProviderInterface->booked($id);
 
             return $this->success($booking, 'Booking fetched successfully', 200);
+
+            $booking->user->notify(new NewNotification(
+                message: 'Your booking has been accepted',
+                channels: ['database'],
+                type: NotificationType::SUCCESS,
+            ));
+
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
         } catch (\Exception $e) {
