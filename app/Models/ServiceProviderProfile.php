@@ -67,4 +67,10 @@ class ServiceProviderProfile extends Model
         return $this->hasManyThrough(Feedback::class, Booking::class, 'service_provider_id', 'booking_id');
     }
 
+    // Define the relationship with OtherCategory
+    public function otherCategories()
+    {
+        return $this->hasMany(OtherCategory::class);
+    }
+
 }

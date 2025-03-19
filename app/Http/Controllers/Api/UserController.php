@@ -212,10 +212,10 @@ class UserController extends Controller
             $category = Category::find($request->category_id);
 
             if ($category && in_array(strtolower($category->category_name), ['others', 'other'])) {
-                OtherCategory::create([
+               $other_category = OtherCategory::create([
                     'service_provider_profile_id' => $service_provider->id,
                     'category_id'         => $category->id,
-                    'category_name'       => $category->category_name,
+                    'category_name'       => $request->category_name,
                     'status'              => 'inactive',
                 ]);
             }
@@ -249,7 +249,8 @@ class UserController extends Controller
                     ]);
                 }
             }
-            $service_provider->load(['subCategories', 'workingDays', 'serviceProviderImage']);
+            $service_provider->load(['otherCategories','subCategories', 'workingDays', 'serviceProviderImage']);
+
             DB::commit();
             return $this->success($service_provider, 'Service Provider created successfully', 200);
         } catch (\Exception $e) {

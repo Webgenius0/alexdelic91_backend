@@ -17,4 +17,16 @@ class OtherCategory extends Model
         'created_at',
         'updated_at',
     ];
+
+    // Define the relationship with Category
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    // Define the relationship with ServiceProviderProfile
+    public function serviceProviderProfile()
+    {
+        return $this->belongsTo(ServiceProviderProfile::class, 'service_provider_profile_id');
+    }
 }
