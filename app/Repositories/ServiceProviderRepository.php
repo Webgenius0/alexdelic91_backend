@@ -93,6 +93,6 @@ class ServiceProviderRepository implements ServiceProviderInterface
 
     public function getProviderDetails($id)
     {
-        return ServiceProviderProfile::with(['user', 'serviceType', 'serviceLocation', 'workingDays', 'serviceProviderImage', 'bookingDataAndTime'])->find($id);
+        return ServiceProviderProfile::with(['user', 'serviceType', 'serviceLocation', 'workingDays.day', 'serviceProviderImage', 'bookingDataAndTime'])->find($id);
     }
 }

@@ -32,7 +32,11 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::get('/job-post/upcoming', 'upcomingJobPost');
 
             Route::get('/job-post/{id}', 'jobPostDetails');
-            route::post('/rejob-post/{id}', 'reJobPost');
+            Route::post('/rejob-post/{id}', 'reJobPost');
+
+            Route::post('/job-post/edit/{id}', 'jobPostEdit');
+            Route::get('/job-post/cancel/{id}', 'jobPostCancel');
+
         });
 
 
@@ -52,7 +56,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         //job post route--------
         Route::controller(JobPostController::class)->group(function () {
             Route::get('/job-post-list', 'getJobPost');
-            Route::get('/singel-job-post/{id}', 'singelJobPost');
+            Route::get('/singel-job-post/{id}', 'singelJobPost');         
         });
 
         Route::controller(JobAcceptController::class)->group(function () {

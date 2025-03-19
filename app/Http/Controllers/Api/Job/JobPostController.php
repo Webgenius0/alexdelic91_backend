@@ -123,4 +123,28 @@ class JobPostController extends Controller
             return $this->error([], "An unexpected error occurred", 500);
         }
     }
+
+    public function jobPostEdit(JobPostRequest $request,$id)
+    {
+        try {
+            $jobpost = $this->JobPostRepositoryInterface->jobPostEdit($request->validated(),$id);
+            return $this->success($jobpost, 'Job post updated successfully', 200);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->error([], "An unexpected error occurred", 500);
+        }
+    }
+
+    public function jobPostCancel($id)
+    {
+        try {
+            $jobpost = $this->JobPostRepositoryInterface->jobPostCancel($id);
+            return $this->success($jobpost, 'Job post cancelled successfully', 200);
+        } catch (CustomException $e) {
+            return $this->error([], $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->error([], "An unexpected error occurred", 500);
+        }
+    }
 }
