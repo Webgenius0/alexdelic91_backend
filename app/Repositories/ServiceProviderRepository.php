@@ -22,7 +22,7 @@ class ServiceProviderRepository implements ServiceProviderInterface
         $userId = auth()->id();
         $user = auth()->user();
         $data = ServiceProviderProfile::query()
-            ->with(['user', 'subCategories', 'serviceType', 'serviceLocation', 'workingDays', 'serviceProviderImage', 'bookingDataAndTime', 'category.subCategories', 'booking.feedbacks'])
+            ->with(['user', 'subCategories', 'serviceType', 'serviceLocation', 'workingDays.day', 'serviceProviderImage', 'bookingDataAndTime', 'category.subCategories', 'booking.feedbacks'])
             ->withAvg('feedbacks', 'rating');
 
         //        return $data->get();
