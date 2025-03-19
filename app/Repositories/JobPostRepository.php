@@ -317,7 +317,11 @@ class JobPostRepository implements JobPostRepositoryInterface
 
     public function jobPostCancel($id)
     {
-        $job = JobPost::where('id', $id)->update(['status' => 'cancelled']);
+        $job = JobPost::where('id', $id)->first();
+
+        $job->update([
+            'status' => 'cancelled',
+        ]);
         if (! $job) {
             throw new CustomException("Job post not found", 200);
         }
