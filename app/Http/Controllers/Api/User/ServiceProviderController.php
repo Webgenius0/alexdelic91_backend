@@ -173,15 +173,12 @@ class ServiceProviderController extends Controller
 
         // dd($data);
 
-        // Handle workdays
-        if (is_array($request->days)) {
-            foreach ($request->days as $day_id) {
-                ServiseProviderWorkDay::updateOrCreate(
-                    [
-                        'service_provider_id' => $user->id,
-                        'day_id' => $day_id
-                    ], [
-                    'service_provider_id' => $user->id,
+        if (is_array($request->day_id)) {
+            // dd($request->day_id);
+            ServiseProviderWorkDay::where('service_provider_id', $data->id)->delete();
+            foreach ($request->day_id as $day_id) {
+                ServiseProviderWorkDay::create([
+                    'service_provider_id' => $data->id,
                     'day_id' => $day_id,
                 ]);
             }

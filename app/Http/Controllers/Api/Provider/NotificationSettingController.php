@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Http\Controllers\Api\Provider;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class NotificationSettingController extends Controller
@@ -15,9 +14,9 @@ class NotificationSettingController extends Controller
     public function notificationsSetting(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'is_notices' => 'nullable|boolean',
+            'is_notices'  => 'nullable|boolean',
             'is_messages' => 'nullable|boolean',
-            'is_likes' => 'nullable|boolean',
+            'is_likes'    => 'nullable|boolean',
             'safety_mode' => 'nullable|boolean',
         ]);
 
@@ -26,12 +25,12 @@ class NotificationSettingController extends Controller
         }
         $user = auth()->user();
 
-        $user->update([
-            'is_notices' => $request->is_notices,
-            'is_messages' => $request->is_messages,
-            'is_likes' => $request->is_likes,
-            'safety_mode' => $request->safety_mode
-        ]);
+        $user->is_notices  = $request->input('is_notices', $user->is_notices);
+        $user->is_messages = $request->input('is_messages', $user->is_messages);
+        $user->is_likes    = $request->input('is_likes', $user->is_likes);
+        $user->safety_mode = $request->input('safety_mode', $user->safety_mode);
+
+        $user->save();
 
         return $this->success($user, 'Notification settings updated successfully', 200);
     }
@@ -42,7 +41,7 @@ class NotificationSettingController extends Controller
 
         $data = User::where('id', $user->id)->select('is_notices', 'is_messages', 'is_likes', 'safety_mode')->first();
 
-        if(! $data) {
+        if (! $data) {
             return $this->error([], 'User Not Found', 200);
         }
 
