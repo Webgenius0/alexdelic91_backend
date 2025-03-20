@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Provider;
 
+use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -33,5 +34,18 @@ class NotificationSettingController extends Controller
         ]);
 
         return $this->success($user, 'Notification settings updated successfully', 200);
+    }
+
+    public function getNotificationsSetting()
+    {
+        $user = auth()->user();
+
+        $data = User::where('id', $user->id)->select('is_notices', 'is_messages', 'is_likes', 'safety_mode')->first();
+
+        if(! $data) {
+            return $this->error([], 'User Not Found', 200);
+        }
+
+        return $this->success($data, 'Notification settings', 200);
     }
 }

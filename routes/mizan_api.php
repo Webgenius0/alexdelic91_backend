@@ -65,6 +65,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
 
         Route::controller(NotificationSettingController::class)->group(function () {
             Route::post('/notifications-setting', 'notificationsSetting');
+            Route::get('/notifications-setting', 'getNotificationsSetting');
         });
     });
 
