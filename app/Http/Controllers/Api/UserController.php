@@ -169,7 +169,7 @@ class UserController extends Controller
             'zip_code'            => 'nullable|string|max:255',
             'start_time'          => 'nullable|string',
             'end_time'            => 'nullable|string',
-            'images.*'            => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
+            'images.*'            => 'nullable|image|mimes:png,jpg,jpeg',
             'subcategories'       => 'nullable|array',
             'subcategories.*'     => 'nullable|integer',
             'days'                => 'nullable|array',
