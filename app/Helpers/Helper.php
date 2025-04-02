@@ -3,6 +3,7 @@
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Upload to Public Folder
@@ -12,7 +13,8 @@ use Illuminate\Support\Facades\Storage;
  * @param  string  $directory
  * @return string
  */
-function uploadImage($file, $folder) {
+function uploadImage($file, $folder)
+{
     if (!$file->isValid()) {
         return null;
     }
@@ -27,13 +29,42 @@ function uploadImage($file, $folder) {
 }
 
 
+function uploadGoogleImage($avatarUrl, $folder)
+{
+    try {
+        // Get image content from Google
+        $imageContents = Http::get($avatarUrl)->body();
+        $imageName = time() . '_' . uniqid() . '.jpg';
+
+        // Define folder path in the public/uploads directory
+        $folderPath = public_path('uploads/' . $folder);
+
+        // Ensure the folder exists
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath, 0755, true);
+        }
+
+        // Define full image path
+        $filePath = $folderPath . '/' . $imageName;
+
+        // Save image file
+        file_put_contents($filePath, $imageContents);
+
+        return 'uploads/' . $folder . '/' . $imageName; // Return relative path
+    } catch (\Exception $e) {
+        return 'default-avatar.png';
+    }
+}
+
+
 /**
  * Upload to Storage Folder
  * Store a file in the specified folder within Laravel's storage directory and return its path.
  *
  * @return string
  */
-function storeFile($file, $folder) {
+function storeFile($file, $folder)
+{
     if (!$file->isValid()) {
         return null;
     }

@@ -42,12 +42,12 @@ class SocialAuthController extends Controller
             $user = User::where('email', $email)->first();
             $isNewUser = false;
 
-            if ($socialUser->getAvatar()) {
-                $avatarUrl = $socialUser->getAvatar();
-                $imageName = uploadImage($avatarUrl, 'User/Avatar'); // Custom function to handle URL images
-            } else {
-                $imageName = 'default-avatar.png'; // Default avatar if Google does not provide one
-            }
+            // if ($socialUser->getAvatar()) {
+            //     $avatarUrl = $socialUser->getAvatar();
+            //     $imageName = uploadGoogleImage($avatarUrl, 'User/Avatar'); // Custom function to handle URL images
+            // } else {
+            //     $imageName = 'default-avatar.png'; // Default avatar if Google does not provide one
+            // }
 
             if (!$user) {
                 $user = User::create([
@@ -56,7 +56,7 @@ class SocialAuthController extends Controller
                     'password'       => bcrypt(Str::random(16)), // Random password
                     'role'           => $request->input('role', 'user'), // Default role if not provided
                     'agree_to_terms' => $request->input('agree_to_terms', 1), // Default to agreed
-                    'avatar'  => $imageName,
+                    'avatar'  => null,
                     'apple_id'       => $request->provider == 'apple' ? $socialUser->getId() : null,
                     'google_id'      => $request->provider == 'google' ? $socialUser->getId() : null,
                 ]);
