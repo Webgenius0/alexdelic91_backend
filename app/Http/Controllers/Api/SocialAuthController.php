@@ -42,6 +42,13 @@ class SocialAuthController extends Controller
             $user = User::where('email', $email)->first();
             $isNewUser = false;
 
+            if ($socialUser->getAvatar()) {
+                $avatarUrl = $socialUser->getAvatar();
+                $imageName = uploadImage($avatarUrl, 'User/Avatar'); // Custom function to handle URL images
+            } else {
+                $imageName = 'default-avatar.png'; // Default avatar if Google does not provide one
+            }
+
             if (!$user) {
                 $user = User::create([
                     'name'           => $request->input('name', $socialUser->getName() ?? 'Unknown User'),
