@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Web\NotificationController;
 
@@ -20,8 +19,7 @@ use App\Http\Controllers\Api\Web\NotificationController;
 
 
 //Social Login
-Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
-Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
 
 //Register API
 Route::controller(RegisterController::class)->prefix('users/register')->group(function () {
