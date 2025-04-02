@@ -75,61 +75,45 @@ class LoginController extends Controller
      * @return \Illuminate\Http\JsonResponse  JSON response with success or error.
      */
 
-    public function userLogin(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email'    => 'required|email|exists:users,email',
-            // 'role'     => 'required',
-            'password' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error($validator->errors(), $validator->errors()->first(), 422);
-        }
-
-        $credentials = $request->only('email', 'password');
-
-        $userData = User::where('email', $request->email)->first();
-
-        if ($userData && Hash::check($request->password, $userData->password)) {
-
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return $this->error([], 'Invalid credentials', 401);
-            }
-            $userData = auth()->user();
-
-            if ($request->has('device_token')) {
-
-                Log::info('Device token:  ' . $request->device_token);
-
-                $userData->fcm_token = $request->device_token;
-            }
-            $userData->save();
-            $userData->setAttribute('token', $token);
-
-            Log::info('User data:  ' . json_encode($userData));
-        } else {
-            return $this->error([], 'Invalid credentials', 401);
-        }
-
-        if ($userData->role == 'service_provider') {
-
-            if ($userData->serviceProviderProfile != null) {
-                $flags = true;
-            } else {
-                $flags = false;
-            }
-        } else {
-            $flags = true;
-        }
-
-        $data = [
-            'user'                 => $userData,
-            'is_service_provider_info' => $flags,
-        ];
-
-        return $this->success($data, 'User authenticated successfully', 200);
-    }
+     public function userLogin(Request $request)
+     {
+         $validator = Validator::make($request->all(), [
+             'email'    => 'required|email|exists:users,email',
+             'role'     => 'required|in:user,service_provider,admin',
+             'password' => 'required',
+         ]);
+     
+         if ($validator->fails()) {
+             return $this->error($validator->errors(), $validator->errors()->first(), 422);
+         }
+     
+         $credentials = $request->only('email', 'password');
+     
+         $userData = User::where('email', $request->email)->first();
+     
+         if (!$userData || !Hash::check($request->password, $userData->password)) {
+             return $this->error([], 'Invalid credentials', 401);
+         }
+     
+        
+         if ($userData->role !== $request->role) {
+             return $this->error([], 'Role mismatch', 403);
+         }
+     
+         if (!$token = JWTAuth::attempt($credentials)) {
+             return $this->error([], 'Invalid credentials', 401);
+         }
+         
+         $flags = $userData->role === 'service_provider' ? (bool) $userData->serviceProviderProfile : true;
+     
+         $data = [
+             'user' => $userData,
+             'is_service_provider_info' => $flags,
+         ];
+     
+         return $this->success($data, 'User authenticated successfully', 200);
+     }
+     
 
     /**
      * Verify Email to send otp
