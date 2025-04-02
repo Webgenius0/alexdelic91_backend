@@ -104,11 +104,12 @@ class LoginController extends Controller
              return $this->error([], 'Invalid credentials', 401);
          }
          
+         $userData->setAttribute('token', $token);
+
          $flags = $userData->role === 'service_provider' ? (bool) $userData->serviceProviderProfile : true;
      
          $data = [
              'user' => $userData,
-             'token' => $token,
              'is_service_provider_info' => $flags,
          ];
      
