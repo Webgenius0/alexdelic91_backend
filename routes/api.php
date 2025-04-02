@@ -20,7 +20,8 @@ use App\Http\Controllers\Api\Web\NotificationController;
 
 
 //Social Login
-Route::post('/social-login', [SocialAuthController::class, 'socialLogin']);
+Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 //Register API
 Route::controller(RegisterController::class)->prefix('users/register')->group(function () {
