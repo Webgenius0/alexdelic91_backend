@@ -15,12 +15,12 @@ class DaysTableSeeder extends Seeder
     public function run(): void
     {
         $days = [
-            ['day_name' => 'S', 'day_slug' => Str::slug('Sunday')],
-            ['day_name' => 'M', 'day_slug' => Str::slug('Monday')],
-            ['day_name' => 'T', 'day_slug' => Str::slug('Tuesday')],
-            ['day_name' => 'W', 'day_slug' => Str::slug('Wednesday')],
+            ['day_name' => 'Su', 'day_slug' => Str::slug('Sunday')],
+            ['day_name' => 'Mo', 'day_slug' => Str::slug('Monday')],
+            ['day_name' => 'Tu', 'day_slug' => Str::slug('Tuesday')],
+            ['day_name' => 'We', 'day_slug' => Str::slug('Wednesday')],
             ['day_name' => 'Th', 'day_slug' => Str::slug('Thursday')],
-            ['day_name' => 'F', 'day_slug' => Str::slug('Friday')],
+            ['day_name' => 'Fr', 'day_slug' => Str::slug('Friday')],
             ['day_name' => 'Sa', 'day_slug' => Str::slug('Saturday')],
             
         ];

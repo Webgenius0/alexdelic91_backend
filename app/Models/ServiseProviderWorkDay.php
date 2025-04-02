@@ -18,4 +18,9 @@ class ServiseProviderWorkDay extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function day()
+    {
+        return $this->belongsTo(Day::class, 'day_id');
+    }
 }

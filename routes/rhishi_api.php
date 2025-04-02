@@ -34,5 +34,6 @@ Route::group(['middleware' => ['jwt.verify']], function () {
 
         Route::get('/get/provider', 'getProviderBookings');
         Route::get('/get/provider/history', 'getProviderBookingsHistory');
+        Route::get('/delete/provider/history', 'deleteProviderBookingsHistory');
     });
 });

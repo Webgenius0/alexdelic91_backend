@@ -193,7 +193,7 @@ class BookingProviderRepository implements BookingProviderInterface
 
         $user = auth()->user();
 
-        $booking = Booking::where('user_id', $user->id)
+        $booking = Booking::where('service_provider_id', $user->id)
             ->where('id', $id)
             ->first();
 
@@ -215,7 +215,7 @@ class BookingProviderRepository implements BookingProviderInterface
 
         $user = auth()->user();
 
-        $booking = Booking::where('user_id', $user->id)
+        $booking = Booking::where('service_provider_id', $user->id)
             ->where('id', $id)
             ->first();
 
@@ -285,6 +285,26 @@ class BookingProviderRepository implements BookingProviderInterface
         return $bookings;
     }
 
+    public function deleteProviderBookingsHistory()
+    {
+        if(!auth()->check()) {
+            throw new CustomException("Unauthorized access", 401);
+        }
+
+        $user = auth()->user();
+
+        $bookings = Booking::where('service_provider_id', $user->id)
+            ->whereDate('booking_date', '<', now())
+            ->get();
+
+        foreach ($bookings as $booking) {
+            $booking->status = 'deleted';
+            $booking->save();
+        }
+
+        return $bookings;
+    }
+
     public function providerWithRatingSingle($id)
     {
         if (!auth()->check()) {
@@ -298,7 +318,7 @@ class BookingProviderRepository implements BookingProviderInterface
             'serviceProvider:id',
             'serviceProvider.serviceProviderProfile:id,user_id,category_id',
             'serviceProvider.serviceProviderProfile.category:id,category_name',
-            'feedback'
+            'feedback.user:id,name,avatar'
         ])
             ->where('service_provider_id', $user->id)
             ->where('id', $id)

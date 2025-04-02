@@ -263,4 +263,68 @@ class JobPostRepository implements JobPostRepositoryInterface
 
         return $job;
     }
+
+    public function jobPostEdit($data, $id)
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            throw new CustomException("User Unauthorized", 401);
+        }
+
+        try {
+
+            DB::beginTransaction();
+
+            $job = JobPost::where('id',$id)->where('user_id', $user->id)->first();
+
+            if (! $job) {
+                throw new CustomException("Job post not found", 200);
+            }
+
+            $job->update([
+                'title'          => $data['title'],
+                'location'       => $data['location'],
+                'latitude'       => $data['latitude'],
+                'longitude'      => $data['longitude'],
+                'category_id'    => $data['category_id'],
+                'subcategory_id' => $data['subcategory_id'],
+                'notes'          => $data['notes'],
+                'start_time'     => $data['start_time'],
+                'end_time'       => $data['end_time'],
+            ]);
+
+            if (isset($data['date'])) {
+                foreach (($data['date']) as $date) {
+                    $job->jobPostDates()->updateOrCreate(
+                        [
+                            'date' => $date,
+                        ],
+                        [
+                            'date' => $date,
+                        ]
+                    );
+                }
+            }
+            DB::commit();
+            $job->load('jobPostDates');
+            return $job;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $e->getMessage();
+        }
+    }
+
+    public function jobPostCancel($id)
+    {
+        $job = JobPost::where('id', $id)->first();
+
+        $job->update([
+            'status' => 'cancelled',
+        ]);
+        if (! $job) {
+            throw new CustomException("Job post not found", 200);
+        }
+        return $job;
+    }
 }

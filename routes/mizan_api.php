@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\Job\JobPostController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Web\FaqController;
+use App\Http\Controllers\Api\Job\JobPostController;
 use App\Http\Controllers\Api\User\BookMarkController;
 use App\Http\Controllers\Api\User\FeedBackController;
-use App\Http\Controllers\Api\User\ServiceProviderController;
-use App\Http\Controllers\Api\Web\FaqController;
 use App\Http\Controllers\Api\Web\Job\JobAcceptController;
+use App\Http\Controllers\Api\User\ServiceProviderController;
+use App\Http\Controllers\Api\Provider\NotificationSettingController;
 
 Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group(['middleware' => ['customer']], function() {
@@ -31,7 +32,11 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::get('/job-post/upcoming', 'upcomingJobPost');
 
             Route::get('/job-post/{id}', 'jobPostDetails');
-            route::post('/rejob-post/{id}', 'reJobPost');
+            Route::post('/rejob-post/{id}', 'reJobPost');
+
+            Route::post('/job-post/edit/{id}', 'jobPostEdit');
+            Route::get('/job-post/cancel/{id}', 'jobPostCancel');
+
         });
 
 
@@ -45,16 +50,22 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::post('/my-rating/{id}', 'store');
 
             Route::post('/profile/update', 'updateProfile');
+            Route::post('/my-availability', 'myAvailability');
         });
 
         //job post route--------
         Route::controller(JobPostController::class)->group(function () {
             Route::get('/job-post-list', 'getJobPost');
-            Route::get('/singel-job-post/{id}', 'singelJobPost');
+            Route::get('/singel-job-post/{id}', 'singelJobPost');         
         });
 
         Route::controller(JobAcceptController::class)->group(function () {
             Route::post('/job-accept/{id}', 'jobAccept');
+        });
+
+        Route::controller(NotificationSettingController::class)->group(function () {
+            Route::post('/notifications-setting', 'notificationsSetting');
+            Route::get('/notifications-setting', 'getNotificationsSetting');
         });
     });
 
