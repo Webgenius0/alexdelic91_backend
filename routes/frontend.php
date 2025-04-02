@@ -20,4 +20,4 @@ Route::get('/page/privacy-and-policy', [PageController::class, 'privacyAndPolicy
 
 
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
-Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+Route::get('google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
