@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Job;
 
 use App\Traits\ApiResponse;
+use App\Services\FCMService;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobPostRequest;
@@ -23,6 +24,14 @@ class JobPostController extends Controller
     {
         try {
             $jobpost = $this->JobPostRepositoryInterface->jobPost($request->validated());
+
+            $fcmService = new FCMService();
+            $fcmService->sendNotification(
+                $jobpost->user->firebaseTokens->token,  
+                'Job Post',
+                'You have a new job post',
+                ['job_post_id' => $jobpost->id]
+            );
 
             return $this->success($jobpost, 'Job post created successfully', 201);
         } catch (CustomException $e) {

@@ -98,6 +98,7 @@ class RegisterController extends Controller
                 } else {
                     $flags = false;
                 }
+                
             } else {
                 $flags = true;
             }

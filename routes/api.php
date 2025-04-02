@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\FirebaseTokenController;
 use App\Http\Controllers\Api\Web\NotificationController;
 
 /*
@@ -69,5 +70,10 @@ Route::group(['middleware' => ['jwt.verify']], function () {
 
     Route::controller(NotificationController::class)->group(function () {
         Route::get('/notifications', 'getNotifications');
+    });
+
+    Route::controller(FirebaseTokenController::class)->group(function () {
+        Route::post('/firebase-token/add', 'updateFirebaseToken');
+        Route::post('/firebase-token/delete', 'deleteFirebaseToken');
     });
 });

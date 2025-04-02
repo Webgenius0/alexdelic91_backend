@@ -28,14 +28,10 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
-    'slack' => [
-        'notifications' => [
-            'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
-        ],
-        'firebase' => [
-            'key_path' => public_path(env('FIREBASE_CREDENTIALS')),
-        ],
-    ],
+
+
+    'firebase' => [
+        'credentials_file' => storage_path('app/my-firast-project-firebase-adminsdk-fbsvc-3c6330591a.json')
+    ]
 
 ];
