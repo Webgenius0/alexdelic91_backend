@@ -7,9 +7,21 @@ use Illuminate\Support\Facades\Http;
 
 trait PushNotifications
 {
+
+    /**
+     * Send a push notification to a given device token
+     *
+     * @param string $token Device token
+     * @param string $title Notification title
+     * @param string $body Notification body
+     * @param array $data Additional data to be sent with the notification
+     *
+     * @return array|false Return the response from the FCM server or false if an error occurs
+     */
+
     public function sendPushNotification($token, $title, $body, $data=[])
     {
-        $fcmUrl = 'https://fcm.googleapis.com/v1/projects/my-firast-project/messages:send';
+        $fcmUrl = 'https://fcm.googleapis.com/v1/projects/instant-business-2da86/messages:send';
 
         $notitication = [
            'notification' => [
@@ -34,7 +46,7 @@ trait PushNotifications
     }
 
     private function getAccessToken(){
-        $keyPath = config('services.slack.firebase.key_path');
+        $keyPath = config('services.firebase.credentials_file');
 
         putenv('GOOGLE_APPLICATION_CREDENTIALS='.$keyPath);
 

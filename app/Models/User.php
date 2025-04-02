@@ -137,4 +137,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(BookMark::class, 'service_provider_id');
     }
+
+    public function firebaseTokens()
+    {
+        return $this->hasOne(FirebaseToken::class);
+    }
 }
