@@ -56,7 +56,7 @@ class SocialAuthController extends Controller
                     'password'       => bcrypt(Str::random(16)), // Random password
                     'role'           => $request->input('role', 'user'), // Default role if not provided
                     'agree_to_terms' => $request->input('agree_to_terms', 1), // Default to agreed
-                    'avatar'  => $socialUser->getAvatar(),
+                    'avatar'  => $imageName,
                     'apple_id'       => $request->provider == 'apple' ? $socialUser->getId() : null,
                     'google_id'      => $request->provider == 'google' ? $socialUser->getId() : null,
                 ]);
@@ -88,7 +88,7 @@ class SocialAuthController extends Controller
                         'address'           => $user->address ?? null,
                         'latitude'          => $user->latitude ?? null,
                         'longitude'         => $user->longitude ?? null,
-                        'avatar'            => $user->profile_image ?? null,
+                        'avatar'            => $user->avatar ?? null,
                         'is_notices'        => $user->is_notices ?? true,
                         'is_messages'       => $user->is_messages ?? true,
                         'is_likes'          => $user->is_likes ?? true,
