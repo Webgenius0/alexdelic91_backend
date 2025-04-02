@@ -27,12 +27,11 @@ class SocialAuthController extends Controller
         $request->validate([
             'token'    => 'required',
             'provider' => 'required|in:apple,google',
-            'role'     => 'sometimes|string',
+            'role'     => 'required|in:user,service_provider',
             'agree_to_terms' => 'sometimes|boolean',
         ]);
 
         try {
-            // Fetch user data from the provider
             $socialUser = Socialite::driver($request->provider)->stateless()->userFromToken($request->token);
 
             if (!$socialUser || !$socialUser->getEmail()) {
@@ -44,7 +43,6 @@ class SocialAuthController extends Controller
             $isNewUser = false;
 
             if (!$user) {
-                // Create new user with additional fields
                 $user = User::create([
                     'name'           => $request->input('name', $socialUser->getName() ?? 'Unknown User'),
                     'email'          => $email,
@@ -93,7 +91,7 @@ class SocialAuthController extends Controller
                         'google_calendar_token' => $user->google_calendar_token ?? null,
                         'token'             => $token,
                     ],
-                    'is_service_provider_info' => true,
+                    'is_service_provider_info' => $user->role === 'service_provider' ? (bool) $user->serviceProviderProfile : true,
                 ],
                 'code'    => 200,
             ]);
