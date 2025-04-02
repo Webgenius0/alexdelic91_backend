@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\FirebaseTokenController;
 use App\Http\Controllers\Api\Web\NotificationController;
+use App\Http\Controllers\Api\SocialAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ use App\Http\Controllers\Api\Web\NotificationController;
 
 
 //Social Login
-
+Route::post('social/login', [SocialAuthController::class, 'socialLogin']);
 
 //Register API
 Route::controller(RegisterController::class)->prefix('users/register')->group(function () {

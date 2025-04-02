@@ -29,6 +29,8 @@ return new class extends Migration
             $table->boolean('is_messages')->default(true);
             $table->boolean('is_likes')->default(true);
             $table->boolean('safety_mode')->default(true);
+            $table->string('google_id')->nullable();
+            $table->string('apple_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

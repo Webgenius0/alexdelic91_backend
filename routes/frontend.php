@@ -4,7 +4,6 @@ use App\Http\Controllers\Web\Frontend\HomeController;
 use App\Http\Controllers\Web\Frontend\ResetController;
 use App\Http\Controllers\Web\Frontend\PageController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\SocialAuthController;
 
 //! Route for Reset Database and Optimize Clear
 Route::get('/reset', [ResetController::class, 'RunMigrations'])->name('reset');
@@ -17,7 +16,3 @@ Route::get('/', [HomeController::class, 'index'])->name('welcome');
 
 //Dynamic Page
 Route::get('/page/privacy-and-policy', [PageController::class, 'privacyAndPolicy'])->name('dynamicPage.privacyAndPolicy');
-
-
-Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
-Route::get('google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
