@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -50,6 +51,8 @@ class User extends Authenticatable implements JWTSubject
         'created_at',
         'updated_at',
         'deleted_at',
+        'google_id',
+        'apple_id',
     ];
 
     /**

@@ -71,22 +71,34 @@ class SocialAuthController extends Controller
             // Generate JWT token
             $token = JWTAuth::fromUser($user);
 
-            $response = [
-                'status'     => true,
-                'message'    => $isNewUser ? 'User registered successfully' : 'User logged in successfully',
-                'token_type' => 'bearer',
-                'token'      => $token,
-                'data'       => [
-                    'id'             => $user->id,
-                    'name'           => $user->name,
-                    'email'          => $user->email,
-                    'role'           => $user->role,
-                    'agree_to_terms' => $user->agree_to_terms,
-                    'avatar'         => $user->avatar,
+            return response()->json([
+                'success' => true,
+                'message' => 'User authenticated successfully',
+                'data'    => [
+                    'user' => [
+                        'id'                => $user->id,
+                        'name'              => $user->name,
+                        'email'             => $user->email,
+                        'role'              => $user->role,
+                        'address'           => $user->address ?? null,
+                        'latitude'          => $user->latitude ?? null,
+                        'longitude'         => $user->longitude ?? null,
+                        'avatar'            => $user->profile_image ?? null,
+                        'is_notices'        => $user->is_notices ?? true,
+                        'is_messages'       => $user->is_messages ?? true,
+                        'is_likes'          => $user->is_likes ?? true,
+                        'safety_mode'       => $user->safety_mode ?? true,
+                        'google_id'         => $user->google_id ?? null,
+                        'apple_id'          => $user->apple_id ?? null,
+                        'google_calendar_token' => $user->google_calendar_token ?? null,
+                        'token'             => $token,
+                    ],
+                    'is_service_provider_info' => true,
                 ],
-            ];
+                'code'    => 200,
+            ]);
 
-            return $this->success($response, $message, 200);
+            // return $this->success($response, $message, 200);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), "Something went wrong", 500);
         }
