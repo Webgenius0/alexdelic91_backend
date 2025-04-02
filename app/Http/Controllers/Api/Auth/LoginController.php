@@ -108,6 +108,7 @@ class LoginController extends Controller
      
          $data = [
              'user' => $userData,
+             'token' => $token,
              'is_service_provider_info' => $flags,
          ];
      
