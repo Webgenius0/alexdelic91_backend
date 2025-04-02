@@ -32,7 +32,7 @@ return [
 
     'firebase' => [
         'credentials_file' => storage_path('app/my-firast-project-firebase-adminsdk-fbsvc-3c6330591a.json')
-    ]
+    ],
 
 
     'google' => [
