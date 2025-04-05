@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Api\Chat;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomConversation;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Events\NotifyParticipant;
+use Namu\WireChat\Models\Conversation;
 
 class ChatController extends Controller
 {
@@ -62,6 +65,7 @@ class ChatController extends Controller
             'user_id' => 'required|exists:users,id',
             'message' => 'required_without|string',
             'file' => 'required_without:message|file|mimes:png,jpg,jpeg,webp|max:2048',
+            'chat_type' => 'required|string|in:direct,job_post',
         ]);
         if ($validator->fails()) {
            return $this->error($validator->errors(), "Validation Error", 422);
@@ -79,12 +83,26 @@ class ChatController extends Controller
                     $message= uploadImage($request->file('file'), 'chat',);
                 }
                 $chat = $formUser->sendMessageTo($toUser, $message);
-
+Log::info("chat created : $chat");
                 // Broadcast events after successful message creation
                 broadcast(new MessageCreated($chat));
                 broadcast(new NotifyParticipant($chat->conversation->participant($toUser), $chat));
 
+                //save the conversation type for showing specific messages
+                if ($request->chat_type == 'job_post'){
+
+                    $conversation = CustomConversation::find($chat->conversation_id); //custom conversation extend the wire chat conversation
+                    if ($conversation){
+                    Log::info("conversation find: $conversation");
+                        $conversation->update([
+                            'chat_type' => 'job_post'
+                        ]);
+                        Log::info("conversation update: $conversation");
+
+                    }
+                }
                 DB::commit();
+
                 return $this->success($chat??[], "Message sent successfully", 200);
             }
 
