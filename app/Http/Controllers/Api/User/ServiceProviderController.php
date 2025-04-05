@@ -191,4 +191,19 @@ class ServiceProviderController extends Controller
             return $this->success($data, 'Availability fetched successfully', 200);
         }
     }
+
+    public function imageDelete($id)
+    {
+        $image = ServiceProviderImage::find($id);
+        if ($image) {
+            $imagePath = public_path($image->images);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+            $image->delete();
+            return $this->success([], 'Image deleted successfully', 200);
+        }
+        return $this->error([], 'Image not found', 404);
+        
+    }
 }
