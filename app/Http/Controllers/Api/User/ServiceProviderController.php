@@ -138,13 +138,10 @@ class ServiceProviderController extends Controller
                     ]);
                 }
             }
-            $data = [
-                'user' => $user,
-                'profile' => $profile,
-            ];
+            $profile->load(['serviceProviderImage']);
 
-            if ($data) {
-                return $this->success($data, 'Profile updated successfully', 200);
+            if ($profile) {
+                return $this->success($profile, 'Profile updated successfully', 200);
             }
         } catch (\Exception $e) {
             return $this->error([], $e->getMessage(), 500);

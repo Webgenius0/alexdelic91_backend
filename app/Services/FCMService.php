@@ -28,3 +28,10 @@ class FCMService{
     }
 }
     
+            // $fcmService = new FCMService();
+            // $fcmService->sendNotification(
+            //     $jobpost->user->firebaseTokens->token,  
+            //     'Job Post',
+            //     'You have a new job post',
+            //     ['job_post_id' => $jobpost->id]
+            // );
