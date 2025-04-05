@@ -83,7 +83,6 @@ class ChatController extends Controller
                     $message= uploadImage($request->file('file'), 'chat',);
                 }
                 $chat = $formUser->sendMessageTo($toUser, $message);
-Log::info("chat created : $chat");
                 // Broadcast events after successful message creation
                 broadcast(new MessageCreated($chat));
                 broadcast(new NotifyParticipant($chat->conversation->participant($toUser), $chat));
@@ -93,11 +92,9 @@ Log::info("chat created : $chat");
 
                     $conversation = CustomConversation::find($chat->conversation_id); //custom conversation extend the wire chat conversation
                     if ($conversation){
-                    Log::info("conversation find: $conversation");
                         $conversation->update([
                             'chat_type' => 'job_post'
                         ]);
-                        Log::info("conversation update: $conversation");
 
                     }
                 }
