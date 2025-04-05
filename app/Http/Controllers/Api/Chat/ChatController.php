@@ -20,42 +20,77 @@ class ChatController extends Controller
     use ApiResponse;
 
     // get all chats
-    public function chats()
+    public function chats(Request $request)
     {
+        // Validate the 'chat_type' parameter (optional, and can be null)
+        $validator = Validator::make($request->all(), [
+            'chat_type' => 'nullable|in:direct,job_post',
+        ]);
+        if ($validator->fails()) {
+            return $this->error($validator->errors(),$validator->errors()->first(), 400); // Return error if validation fails
+        }
+
 
         $user = auth()->user();
-        $chat = $user->conversations()
+        $chatQuery = $user->conversations()
             ->with(['participants' => function ($query) use ($user) {
                 $query->with('participantable:id,name,avatar')->where('participantable_id', '!=', auth()->id());
 
-            }, 'lastMessage'])
-            ->get();
+            }, 'lastMessage']);
+
+        // Apply chat_type filter if provided, including NULL
+        if ($request->has('chat_type')) {
+            $chatQuery->where('chat_type', $request->chat_type);
+        }
+
+        $chat = $chatQuery->get();
+
 
         return $this->success($chat, "Chat list fetch successfully", 200);
     }
     // get single chat details
     public function chat($user_id)
     {
+        // Find the user by ID
         $user = User::find($user_id);
         if (!$user) {
             return $this->error([], "User not found", 404);
         }
+
         // Get pagination parameters from the request
         $perPage = request()->get('per_page', 100);
         $page = request()->get('page', 1);
 
-        // Paginate messages (using dynamic pagination parameters)
-        $chat = $user->conversations()
-            ->with(['participants' => function ($query) use ($user) {
-                $query->with('participantable:id,name,avatar');
-
-            }, 'messages' => function ($query) use ($perPage) {
-                $query->latest()->paginate($perPage);
-            }])
+        // Fetch the conversation with the specified user (make sure to load participants)
+        $conversation = auth()->user()->conversations()
+            ->whereHas('participants', function ($query) use ($user) {
+                $query->where('participantable_id', $user->id);
+            })
             ->first();
 
-        return $this->success($chat??[], "Chat fetch successfully ", 200);
+        if (!$conversation) {
+            return $this->error([], "Conversation not found", 404);
+        }
+
+        // Paginate the messages for the found conversation
+        $messages = $conversation->messages()
+            ->latest()
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        // Load the participants and any other necessary relationships
+        $conversation->load([
+            'participants' => function ($query) {
+                $query->with('participantable:id,name,avatar');
+            }
+        ]);
+
+        // Return success response with the conversation and messages
+        return $this->success([
+            'conversation' => $conversation,
+            'messages' => $messages
+        ], "Chat fetched successfully", 200);
     }
+
 
 
 // send message
