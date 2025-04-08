@@ -43,7 +43,7 @@ class SocialAuthController extends Controller
             $email = $socialUser->getEmail();
             $user = User::where('email', $email)->first();
             $isNewUser = false;
-            dd($request->input('role'));
+            // dd($request->input('role'));
             // if ($socialUser->getAvatar()) {
             //     $avatarUrl = $socialUser->getAvatar();
             //     $imageName = uploadGoogleImage($avatarUrl, 'User/Avatar'); // Custom function to handle URL images
