@@ -54,7 +54,7 @@ class SocialAuthController extends Controller
                     'name'           => $request->input('name', $socialUser->getName() ?? 'Unknown User'),
                     'email'          => $email,
                     'password'       => bcrypt(Str::random(16)), // Random password
-                    'role'           => $request->role,
+                    'role'           => $request->input('role'),
                     'agree_to_terms' => $request->input('agree_to_terms', 1), // Default to agreed
                     'avatar'  => null,
                     'apple_id'       => $request->provider == 'apple' ? $socialUser->getId() : null,
