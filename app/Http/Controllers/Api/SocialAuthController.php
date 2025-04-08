@@ -31,7 +31,7 @@ class SocialAuthController extends Controller
             'agree_to_terms' => 'sometimes|boolean',
         ]);
 
-        dd($request->all());
+        
 
         try {
             $socialUser = Socialite::driver($request->provider)->stateless()->userFromToken($request->token);
@@ -43,7 +43,7 @@ class SocialAuthController extends Controller
             $email = $socialUser->getEmail();
             $user = User::where('email', $email)->first();
             $isNewUser = false;
-
+            dd($request->all());
             // if ($socialUser->getAvatar()) {
             //     $avatarUrl = $socialUser->getAvatar();
             //     $imageName = uploadGoogleImage($avatarUrl, 'User/Avatar'); // Custom function to handle URL images
