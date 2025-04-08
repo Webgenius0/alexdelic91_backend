@@ -41,7 +41,7 @@ class SocialAuthController extends Controller
             }
 
             $email = $socialUser->getEmail();
-            $user = User::where('email', $email)->first();
+            // $user = User::where('email', $email)->first();
             $isNewUser = false;
             // dd($request->input('role'));
             // if ($socialUser->getAvatar()) {
