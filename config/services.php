@@ -41,4 +41,13 @@ return [
         'redirect' => env('GOOGLE_LOGIN_REDIRECT_URI'),
     ],
 
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'), // Your Apple Service ID
+        'team_id' => env('APPLE_TEAM_ID'), // Apple Developer Team ID
+        'key_id' => env('APPLE_KEY_ID'), // Key ID from Apple Developer
+        'private_key' => storage_path('apple_private_key.pem'), // Path to Apple private key
+
+        'redirect' => env('APPLE_REDIRECT_URI'),
+    ],
+
 ];
