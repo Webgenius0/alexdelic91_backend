@@ -51,6 +51,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
 
             Route::post('/profile/update', 'updateProfile');
             Route::post('/my-availability', 'myAvailability');
+
+            Route::post('/image-delete/{id}', 'imageDelete');
         });
 
         //job post route--------

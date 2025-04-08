@@ -31,6 +31,8 @@ class SocialAuthController extends Controller
             'agree_to_terms' => 'sometimes|boolean',
         ]);
 
+        
+
         try {
             $socialUser = Socialite::driver($request->provider)->stateless()->userFromToken($request->token);
 
@@ -41,7 +43,6 @@ class SocialAuthController extends Controller
             $email = $socialUser->getEmail();
             $user = User::where('email', $email)->first();
             $isNewUser = false;
-
             // if ($socialUser->getAvatar()) {
             //     $avatarUrl = $socialUser->getAvatar();
             //     $imageName = uploadGoogleImage($avatarUrl, 'User/Avatar'); // Custom function to handle URL images
@@ -54,7 +55,7 @@ class SocialAuthController extends Controller
                     'name'           => $request->input('name', $socialUser->getName() ?? 'Unknown User'),
                     'email'          => $email,
                     'password'       => bcrypt(Str::random(16)), // Random password
-                    'role'           => $request->input('role', 'user'), // Default role if not provided
+                    'role'           => $request->input('role'),
                     'agree_to_terms' => $request->input('agree_to_terms', 1), // Default to agreed
                     'avatar'  => null,
                     'apple_id'       => $request->provider == 'apple' ? $socialUser->getId() : null,
