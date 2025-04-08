@@ -41,7 +41,7 @@ class SocialAuthController extends Controller
             }
 
             $email = $socialUser->getEmail();
-            $oldUser = User::where('email', $email)->first();
+            $user = User::where('email', $email)->first();
             $isNewUser = false;
             // if ($socialUser->getAvatar()) {
             //     $avatarUrl = $socialUser->getAvatar();
@@ -50,7 +50,7 @@ class SocialAuthController extends Controller
             //     $imageName = 'default-avatar.png'; // Default avatar if Google does not provide one
             // }
 
-            if (!$oldUser) {
+            if (!$user) {
                 $user = User::create([
                     'name'           => $request->input('name', $socialUser->getName() ?? 'Unknown User'),
                     'email'          => $email,
@@ -64,14 +64,12 @@ class SocialAuthController extends Controller
                 $isNewUser = true;
             } else {
                 // Update missing IDs if necessary
-                if ($request->provider == 'apple' && !$oldUser->apple_id) {
-                    $oldUser->update(['apple_id' => $socialUser->getId()]);
+                if ($request->provider == 'apple' && !$user->apple_id) {
+                    $user->update(['apple_id' => $socialUser->getId()]);
                 }
-                if ($request->provider == 'google' && !$oldUser->google_id) {
-                    $oldUser->update(['google_id' => $socialUser->getId()]);
+                if ($request->provider == 'google' && !$user->google_id) {
+                    $user->update(['google_id' => $socialUser->getId()]);
                 }
-
-                $user = $oldUser;
             }
 
             $message = $isNewUser ? 'User registered successfully' : 'User logged in successfully';
