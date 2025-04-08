@@ -31,6 +31,8 @@ class SocialAuthController extends Controller
             'agree_to_terms' => 'sometimes|boolean',
         ]);
 
+        dd($request->all());
+
         try {
             $socialUser = Socialite::driver($request->provider)->stateless()->userFromToken($request->token);
 
