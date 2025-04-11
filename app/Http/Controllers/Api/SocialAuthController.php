@@ -81,7 +81,12 @@ class SocialAuthController extends Controller
             if( $user->role == $request->role ) {
                 $user->setAttribute('token', $token);
             }else{
-                return $this->error([], "You are not a valid {{$user->role}}", 400);
+                if( $user->role == 'user' ) {
+                    return $this->error([], 'Your are not a service provider registered', 403);
+                }
+                if( $user->role == 'service_provider' ) {
+                    return $this->error([], 'Your are not a customer registered', 403);
+                }
             }
 
             return response()->json([
