@@ -75,7 +75,20 @@ class SocialAuthController extends Controller
             $message = $isNewUser ? 'User registered successfully' : 'User logged in successfully';
 
             // Generate JWT token
+           
             $token = JWTAuth::fromUser($user);
+
+            if($user->role == 'service_provider') {
+                $user->setAttribute('token', $token);
+            }else{
+                return $this->error([], 'You are not a service provider', 400);
+            }
+
+            if($user->role == 'user') {
+                $user->setAttribute('token', $token);
+            }else{
+                return $this->error([], 'You are not a user', 400);
+            }
 
             return response()->json([
                 'success' => true,
