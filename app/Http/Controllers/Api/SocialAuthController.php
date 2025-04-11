@@ -78,9 +78,7 @@ class SocialAuthController extends Controller
            
             $token = JWTAuth::fromUser($user);
 
-            if($user->role == 'service_provider') {
-                $user->setAttribute('token', $token);
-            }else if($user->role == 'user') {
+            if( $user->role == $request->role ) {
                 $user->setAttribute('token', $token);
             }else{
                 return $this->error([], "You are not a valid {{$user->role}}", 400);
