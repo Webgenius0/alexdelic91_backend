@@ -29,21 +29,20 @@ class SocialAuthController extends Controller
             'token'    => 'required',
             'provider' => 'required|in:apple,google',
             'role'     => 'required|in:user,service_provider',
-            'client_id' => 'required_if:provider,apple',
         ]);
 
         try {
             if ($request->provider === 'apple') {
                 // Choose credentials based on client_id
-                $clientId = $request->client_id;
+                $role = $request->role;
 
-                if ($clientId === config('services.apple.app1.client_id')) {
+                if ($role === 'service_provider') {
                     $appleConfig = [
                         'client_id' => config('services.apple.app1.client_id'),
                         'key_id' => config('services.apple.app1.key_id'),
                         'private_key_path' => config('services.apple.app1.private_key'),
                     ];
-                } elseif ($clientId === config('services.apple.app2.client_id')) {
+                } elseif ($role === 'user') {
                     $appleConfig = [
                         'client_id' => config('services.apple.app2.client_id'),
                         'key_id' => config('services.apple.app2.key_id'),
@@ -117,16 +116,16 @@ class SocialAuthController extends Controller
             $message = $isNewUser ? 'User registered successfully' : 'User logged in successfully';
 
             // Generate JWT token
-           
+
             $token = JWTAuth::fromUser($user);
 
-            if( $user->role == $request->role ) {
+            if ($user->role == $request->role) {
                 $user->setAttribute('token', $token);
-            }else{
-                if( $user->role == 'user' ) {
+            } else {
+                if ($user->role == 'user') {
                     return $this->error([], 'Your are not a service provider registered', 403);
                 }
-                if( $user->role == 'service_provider' ) {
+                if ($user->role == 'service_provider') {
                     return $this->error([], 'Your are not a customer registered', 403);
                 }
             }
