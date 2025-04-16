@@ -71,7 +71,6 @@ class ChatController extends Controller
         if (!$conversation) {
             return $this->error([], "Conversation not found", 404);
         }
-
         // Paginate the messages for the found conversation
         $messages = $conversation->messages()
             ->latest()
