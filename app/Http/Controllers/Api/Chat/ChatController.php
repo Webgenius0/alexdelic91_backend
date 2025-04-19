@@ -69,7 +69,9 @@ class ChatController extends Controller
             ->first();
 
         if (!$conversation) {
-            return $this->error([], "Conversation not found", 404);
+            $auth = auth()->user();
+            $conversation = $auth->createConversationWith($user );
+            return $this->success([$conversation], "New Conversation created", 201);
         }
         // Paginate the messages for the found conversation
         $messages = $conversation->messages()
