@@ -83,7 +83,7 @@ class RegisterController extends Controller
             $user->password       = Hash::make($request->input('password')); // Hash the password
             $user->role           = $request->input('role');
             $user->agree_to_terms = $request->input('agree_to_terms');
-
+            $user->email_verified_at = Carbon::now();
             $user->save();
 
             $user->notify(new NewNotification(
@@ -98,7 +98,7 @@ class RegisterController extends Controller
                 } else {
                     $flags = false;
                 }
-                
+
             } else {
                 $flags = true;
             }
