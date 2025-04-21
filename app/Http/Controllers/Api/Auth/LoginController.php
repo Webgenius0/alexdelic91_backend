@@ -96,7 +96,7 @@ class LoginController extends Controller
          }
      
         
-         if ($userData->role !== $request->role) {
+         if ($userData->role != $request->role) {
              return $this->error([], 'Role mismatch', 403);
          }
      
