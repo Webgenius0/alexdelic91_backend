@@ -69,9 +69,17 @@ class ChatController extends Controller
             ->first();
 
         if (!$conversation) {
-            return $this->error([], "Conversation not found", 404);
+            $auth = auth()->user();
+            $conversation = $auth->createConversationWith($user );
+//            return $this->success([], "New Conversation created", 201);
+            return response()->json([
+                'success' => true,
+                'message' => "New Conversation created",
+                'conversation_id' => $conversation->id,
+                'data' => [],
+                'code' => 201
+            ], 201);
         }
-
         // Paginate the messages for the found conversation
         $messages = $conversation->messages()
             ->latest()
@@ -85,10 +93,15 @@ class ChatController extends Controller
         ]);
 
         // Return success response with the conversation and messages
-        return $this->success([
-            'conversation' => $conversation,
-            'messages' => $messages
-        ], "Chat fetched successfully", 200);
+//        return $this->success(, "Chat fetched successfully", 200);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Chat fetched successfully",
+            'conversation_id' => $conversation->id,
+            'data' => ['conversation' => $conversation,'messages' => $messages],
+            'code' => 200
+        ], 200);
     }
 
 
