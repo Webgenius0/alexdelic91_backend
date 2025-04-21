@@ -42,12 +42,17 @@ return [
     ],
 
     'apple' => [
-        'client_id' => env('APPLE_CLIENT_ID'), // Your Apple Service ID
-        'team_id' => env('APPLE_TEAM_ID'), // Apple Developer Team ID
-        'key_id' => env('APPLE_KEY_ID'), // Key ID from Apple Developer
-        'private_key' => storage_path('apple_private_key.pem'), // Path to Apple private key
-
+        'app1' => [
+            'client_id' => env('APPLE1_CLIENT_ID'),
+            'key_id' => env('APPLE1_KEY_ID'),
+            'private_key' => storage_path('apple_private_key1.pem'),
+        ],
+        'app2' => [
+            'client_id' => env('APPLE2_CLIENT_ID'),
+            'key_id' => env('APPLE2_KEY_ID'),
+            'private_key' => storage_path('apple_private_key2.pem'),
+        ],
+        'team_id' => env('APPLE_TEAM_ID'),
         'redirect' => env('APPLE_REDIRECT_URI'),
     ],
-
 ];

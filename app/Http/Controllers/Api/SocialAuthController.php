@@ -12,6 +12,7 @@ use Exception;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Firebase\JWT\JWT;
 
 class SocialAuthController extends Controller
 {
@@ -28,12 +29,52 @@ class SocialAuthController extends Controller
             'token'    => 'required',
             'provider' => 'required|in:apple,google',
             'role'     => 'required|in:user,service_provider',
-            'agree_to_terms' => 'sometimes|boolean',
         ]);
 
-        
-
         try {
+            if ($request->provider === 'apple') {
+                // Choose credentials based on client_id
+                $role = $request->role;
+
+                if ($role === 'service_provider') {
+                    $appleConfig = [
+                        'client_id' => config('services.apple.app1.client_id'),
+                        'key_id' => config('services.apple.app1.key_id'),
+                        'private_key_path' => config('services.apple.app1.private_key'),
+                    ];
+                } elseif ($role === 'user') {
+                    $appleConfig = [
+                        'client_id' => config('services.apple.app2.client_id'),
+                        'key_id' => config('services.apple.app2.key_id'),
+                        'private_key_path' => config('services.apple.app2.private_key'),
+                    ];
+                } else {
+                    return $this->error([], 'Invalid Apple client_id', 422);
+                }
+
+                // Generate client secret
+                $privateKey = trim(file_get_contents($appleConfig['private_key_path']));
+                $teamId = config('services.apple.team_id');
+
+                $now = now()->timestamp;
+                $exp = now()->addMonths(6)->timestamp;
+
+                $payload = [
+                    'iss' => $teamId,
+                    'iat' => $now,
+                    'exp' => $exp,
+                    'aud' => 'https://appleid.apple.com',
+                    'sub' => $appleConfig['client_id'],
+                ];
+
+                $clientSecret = JWT::encode($payload, $privateKey, 'ES256', $appleConfig['key_id']);
+
+                // Reconfigure Socialite at runtime
+                config([
+                    'services.apple.client_id' => $appleConfig['client_id'],
+                    'services.apple.client_secret' => $clientSecret,
+                ]);
+            }
             $socialUser = Socialite::driver($request->provider)->stateless()->userFromToken($request->token);
 
             if (!$socialUser || !$socialUser->getEmail()) {
@@ -75,16 +116,16 @@ class SocialAuthController extends Controller
             $message = $isNewUser ? 'User registered successfully' : 'User logged in successfully';
 
             // Generate JWT token
-           
+
             $token = JWTAuth::fromUser($user);
 
-            if( $user->role == $request->role ) {
+            if ($user->role == $request->role) {
                 $user->setAttribute('token', $token);
-            }else{
-                if( $user->role == 'user' ) {
+            } else {
+                if ($user->role == 'user') {
                     return $this->error([], 'Your are not a service provider registered', 403);
                 }
-                if( $user->role == 'service_provider' ) {
+                if ($user->role == 'service_provider') {
                     return $this->error([], 'Your are not a customer registered', 403);
                 }
             }
