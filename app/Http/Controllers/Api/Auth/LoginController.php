@@ -82,6 +82,8 @@ class LoginController extends Controller
              'role'     => 'required|in:user,service_provider,admin',
              'password' => 'required',
          ]);
+
+         
      
          if ($validator->fails()) {
              return $this->error($validator->errors(), $validator->errors()->first(), 422);
@@ -94,7 +96,6 @@ class LoginController extends Controller
          if (!$userData || !Hash::check($request->password, $userData->password)) {
              return $this->error([], 'Invalid credentials', 401);
          }
-     
         
          if ($userData->role != $request->role) {
              return $this->error([], 'Role mismatch', 403);
@@ -106,7 +107,11 @@ class LoginController extends Controller
          
          $userData->setAttribute('token', $token);
 
+        //  return $userData;
+
          $flags = $userData->role === 'service_provider' ? (bool) $userData->serviceProviderProfile : true;
+
+        //  return $flags;
      
          $data = [
              'user' => $userData,
