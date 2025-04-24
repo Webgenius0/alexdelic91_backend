@@ -76,7 +76,7 @@ class ChatController extends Controller
                 'success' => true,
                 'message' => "New Conversation created",
                 'conversation_id' => $conversation->id,
-                'data' => [],
+                'data' => null,
                 'code' => 201
             ], 201);
         }
