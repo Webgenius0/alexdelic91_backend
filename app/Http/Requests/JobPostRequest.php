@@ -25,7 +25,7 @@ class JobPostRequest extends FormRequest
             'title' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
-            'location' => 'required|string',
+            'location' => 'nullable|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'notes' => 'nullable|string',

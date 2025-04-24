@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->foreignId('subcategory_id')->constrained('subcategories')->onDelete('cascade');
-            $table->string('location');
+            $table->string('location')->nullable();
             $table->string('latitude', 255)->nullable();
             $table->string('longitude', 255)->nullable();
             $table->time('start_time')->nullable();
