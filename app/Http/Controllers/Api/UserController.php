@@ -39,6 +39,10 @@ class UserController extends Controller
             return $this->error([], 'User Not Found', 200);
         }
 
+        if ($data->feedbacks_avg_rating !== null) {
+            $data->feedbacks_avg_rating = round($data->feedbacks_avg_rating, 1);
+        }
+
         return $this->success($data, 'User data fetched successfully', 200);
     }
 
