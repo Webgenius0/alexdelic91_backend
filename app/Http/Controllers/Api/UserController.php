@@ -33,7 +33,7 @@ class UserController extends Controller
 
         $user = auth()->user();
 
-        $data = User::with('serviceProviderProfile.serviceProviderImage', 'serviceProviderProfile.workingDays', 'serviceProviderProfile.subCategories', 'serviceProviderProfile.otherCategories')->where('id', $user->id)->first();
+        $data = User::with('serviceProviderProfile.serviceProviderImage', 'serviceProviderProfile.workingDays', 'serviceProviderProfile.subCategories', 'serviceProviderProfile.otherCategories')->withAvg('feedbacks', 'rating')->where('id', $user->id)->first();
 
         if (! $data) {
             return $this->error([], 'User Not Found', 200);
