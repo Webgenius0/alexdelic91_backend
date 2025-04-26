@@ -26,9 +26,11 @@ class DatabaseSeeder extends Seeder
         $this->call(ServiceProviderSubcategorySeeder::class);
         $this->call(ServiceProviderImagesSeeder::class);
         $this->call(ServiceProviderWorkDaysSeeder::class);
-        $this->call(BookingSeeder::class);
         $this->call(FeedbackSeeder::class);
         $this->call(FaqsTableSeeder::class);
         $this->call(BannerSeeder::class);
+        $this->call(JobPostSeeder::class);
+        $this->call(JobPostDateSeeder::class);
+        $this->call(BookingSeeder::class);
     }
 }
