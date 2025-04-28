@@ -37,13 +37,13 @@ class BookingProviderController extends Controller
                 type: NotificationType::SUCCESS,
             ));
 
-            // $fcmService = new FCMService();
-            // $fcmService->sendNotification(
-            //     $booking->serviceProvider->firebaseTokens->token,  
-            //     'Booking Request',
-            //     'You have a new booking',
-            //     ['booking_id' => $booking->id]
-            // );
+            $fcmService = new FCMService();
+            $fcmService->sendNotification(
+                $booking->serviceProvider->firebaseTokens->token,  
+                'Booking Request',
+                'You have a new booking',
+                ['booking_id' => $booking->id]
+            );
             return $this->success($booking, 'Booking created successfully', 201);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
