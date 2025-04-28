@@ -88,7 +88,7 @@ class ChatController extends Controller
         // Load the participants and any other necessary relationships
         $conversation->load([
             'participants' => function ($query) {
-                $query->with('participantable:id,name,avatar','latitude','longitude');
+                $query->with('participantable');
             }
         ]);
 
