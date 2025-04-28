@@ -58,6 +58,7 @@ class JobAcceptController extends Controller
         ]);
 
         $data->user->notify(new NewNotification(
+            subject: 'Job Booked',
             message: 'Your job has been accepted',
             channels: ['database'],
             type: NotificationType::SUCCESS,

@@ -15,9 +15,19 @@ class NotificationController extends Controller
         $user = auth()->user();
 
         $data = $user->notifications()
-            ->select('id', 'data', 'read_at', 'created_at')
+            ->with('notifiable')
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id'          => $notification->id,
+                    'data'        => $notification->data,
+                    'read_at'     => $notification->read_at,
+                    'created_at'  => $notification->created_at,
+                    'user_name'   => $notification->notifiable?->name,
+                    'user_avatar' => $notification->notifiable?->avatar,
+                ];
+            });
 
         if ($data->isEmpty()) {
             return $this->error([], 'No Notifications Found', 200);

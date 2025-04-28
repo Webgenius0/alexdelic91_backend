@@ -31,18 +31,19 @@ class BookingProviderController extends Controller
         try {
             $booking = $this->bookingProviderInterface->book($request->validated());
             $booking->serviceProvider->notify(new NewNotification(
+                subject: 'Booking Request',
                 message: 'You have a new booking',
                 channels: ['database'],
                 type: NotificationType::SUCCESS,
             ));
 
-            $fcmService = new FCMService();
-            $fcmService->sendNotification(
-                $booking->serviceProvider->firebaseTokens->token,  
-                'Booking Request',
-                'You have a new booking',
-                ['booking_id' => $booking->id]
-            );
+            // $fcmService = new FCMService();
+            // $fcmService->sendNotification(
+            //     $booking->serviceProvider->firebaseTokens->token,  
+            //     'Booking Request',
+            //     'You have a new booking',
+            //     ['booking_id' => $booking->id]
+            // );
             return $this->success($booking, 'Booking created successfully', 201);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
@@ -124,6 +125,7 @@ class BookingProviderController extends Controller
             return $this->success($booking, 'Booking cancelled successfully', 200);
 
             $booking->user->notify(new NewNotification(
+                subject: 'Booking Cancelled',
                 message: 'Your booking has been cancelled',
                 channels: ['database'],
                 type: NotificationType::SUCCESS,
