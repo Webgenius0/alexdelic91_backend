@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Chat;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomConversation;
+use App\Models\JobPost;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -49,7 +50,7 @@ class ChatController extends Controller
         return $this->success($chat, "Chat list fetch successfully", 200);
     }
     // get single chat details
-    public function chat($user_id)
+    public function chat($user_id,$job_post_id = null)
     {
         // Find the user by ID
         $user = User::find($user_id);
@@ -60,6 +61,15 @@ class ChatController extends Controller
         // Get pagination parameters from the request
         $perPage = request()->get('per_page', 100);
         $page = request()->get('page', 1);
+
+        //job post
+        if ($job_post_id) {
+            $jobPost = JobPost::with([
+                'category:id,category_name',
+                'subcategory:id,subcategory_name',
+                'user',
+            ])->find($job_post_id);
+        }
 
         // Fetch the conversation with the specified user (make sure to load participants)
         $conversation = auth()->user()->conversations()
@@ -76,6 +86,7 @@ class ChatController extends Controller
                 'success' => true,
                 'message' => "New Conversation created",
                 'conversation_id' => $conversation->id,
+                'job_post' => $jobPost ?? null,
                 'data' => null,
                 'code' => 201
             ], 201);
@@ -99,6 +110,7 @@ class ChatController extends Controller
             'success' => true,
             'message' => "Chat fetched successfully",
             'conversation_id' => $conversation->id,
+            'job_post' => $jobPost ?? null,
             'data' => ['conversation' => $conversation,'messages' => $messages],
             'code' => 200
         ], 200);
