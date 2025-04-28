@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\BookingProvider;
 
 use App\Traits\ApiResponse;
+use App\Services\FCMService;
 use Illuminate\Http\Request;
 use App\Enum\NotificationType;
 use App\Exceptions\CustomException;
@@ -34,6 +35,14 @@ class BookingProviderController extends Controller
                 channels: ['database'],
                 type: NotificationType::SUCCESS,
             ));
+
+            $fcmService = new FCMService();
+            $fcmService->sendNotification(
+                $booking->serviceProvider->firebaseTokens->token,  
+                'Booking Request',
+                'You have a new booking',
+                ['booking_id' => $booking->id]
+            );
             return $this->success($booking, 'Booking created successfully', 201);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
@@ -120,6 +129,14 @@ class BookingProviderController extends Controller
                 type: NotificationType::SUCCESS,
             ));
 
+            $fcmService = new FCMService();
+            $fcmService->sendNotification(
+                $booking->user->firebaseTokens->token,  
+                'Booking Cancelled',
+                'Your booking has been cancelled',
+                ['booking_id' => $booking->id]
+            );
+
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
         } catch (\Exception $e) {
@@ -139,6 +156,14 @@ class BookingProviderController extends Controller
                 channels: ['database'],
                 type: NotificationType::SUCCESS,
             ));
+
+            $fcmService = new FCMService();
+            $fcmService->sendNotification(
+                $booking->user->firebaseTokens->token,  
+                'Booking Accepted',
+                'Your booking has been accepted',
+                ['booking_id' => $booking->id]
+            );
 
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());

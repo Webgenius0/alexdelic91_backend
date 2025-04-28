@@ -25,13 +25,13 @@ class JobPostController extends Controller
         try {
             $jobpost = $this->JobPostRepositoryInterface->jobPost($request->validated());
 
-            // $fcmService = new FCMService();
-            // $fcmService->sendNotification(
-            //     $jobpost->user->firebaseTokens->token,  
-            //     'Job Post',
-            //     'You have a new job post',
-            //     ['job_post_id' => $jobpost->id]
-            // );
+            $fcmService = new FCMService();
+            $fcmService->sendNotification(
+                $jobpost->user->firebaseTokens->token,  
+                'Job Post',
+                'You have a new job post',
+                ['job_post_id' => $jobpost->id]
+            );
 
             return $this->success($jobpost, 'Job post created successfully', 201);
         } catch (CustomException $e) {

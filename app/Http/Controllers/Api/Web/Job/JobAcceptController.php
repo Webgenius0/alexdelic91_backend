@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Web\Job;
 use App\Models\Booking;
 use App\Models\JobPost;
 use App\Traits\ApiResponse;
+use App\Services\FCMService;
 use Illuminate\Http\Request;
 use App\Enum\NotificationType;
 use App\Http\Controllers\Controller;
@@ -61,6 +62,14 @@ class JobAcceptController extends Controller
             channels: ['database'],
             type: NotificationType::SUCCESS,
         ));
+
+        $fcmService = new FCMService();
+            $fcmService->sendNotification(
+                $data->user->firebaseTokens->token,  
+                'Job Booked',
+                'Your job has been accepted',
+                ['booking_id' => $data->id]
+            );
 
         return $this->success($data, 'Job accepted successfully', 200);
     }
