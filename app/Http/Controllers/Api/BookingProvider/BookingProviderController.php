@@ -1,15 +1,16 @@
 <?php
+
 namespace App\Http\Controllers\Api\BookingProvider;
 
+use App\Traits\ApiResponse;
+use App\Services\FCMService;
+use Illuminate\Http\Request;
 use App\Enum\NotificationType;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingRequest;
-use App\Interface\BookingProviderInterface;
 use App\Notifications\NewNotification;
-use App\Services\FCMService;
-use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
+use App\Interface\BookingProviderInterface;
 
 class BookingProviderController extends Controller
 {
@@ -36,18 +37,12 @@ class BookingProviderController extends Controller
                 type: NotificationType::SUCCESS,
             ));
 
-            // Collect all tokens
-            $tokens = $booking->serviceProvider->firebaseTokens->pluck('token')->toArray();
-
             $fcmService = new FCMService();
-            
-            foreach ($tokens as $token) {
-                $fcmService->sendNotification(
-                    $token, 
-                    'Booking Request',
-                    'You have a new booking',
-                );
-            }
+            $fcmService->sendNotification(
+                $booking->serviceProvider->firebaseTokens->token,  
+                'Booking Request',
+                'You have a new booking',
+            );
             return $this->success($booking, 'Booking created successfully', 201);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
@@ -137,7 +132,7 @@ class BookingProviderController extends Controller
 
             $fcmService = new FCMService();
             $fcmService->sendNotification(
-                $booking->user->firebaseTokens->token,
+                $booking->user->firebaseTokens->token,  
                 'Booking Cancelled',
                 'Your booking has been cancelled',
             );
@@ -164,7 +159,7 @@ class BookingProviderController extends Controller
 
             $fcmService = new FCMService();
             $fcmService->sendNotification(
-                $booking->user->firebaseTokens->token,
+                $booking->user->firebaseTokens->token,  
                 'Booking Accepted',
                 'Your booking has been accepted',
             );
