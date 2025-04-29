@@ -50,8 +50,9 @@ class ChatController extends Controller
         return $this->success($chat, "Chat list fetch successfully", 200);
     }
     // get single chat details
-    public function chat($user_id,$job_post_id = null)
+    public function chat($user_id, Request $request)
     {
+
         // Find the user by ID
         $user = User::find($user_id);
         if (!$user) {
@@ -63,6 +64,7 @@ class ChatController extends Controller
         $page = request()->get('page', 1);
 
         //job post
+        $job_post_id = $request->get('job_post_id');
         if ($job_post_id) {
             $jobPost = JobPost::with([
                 'category:id,category_name',
