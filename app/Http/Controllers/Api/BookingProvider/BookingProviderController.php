@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Enum\NotificationType;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
+use App\Services\FCMCustomerService;
 use App\Http\Requests\BookingRequest;
 use App\Notifications\NewNotification;
 use App\Interface\BookingProviderInterface;
@@ -130,7 +131,7 @@ class BookingProviderController extends Controller
                 type: NotificationType::SUCCESS,
             ));
 
-            $fcmService = new FCMService();
+            $fcmService = new FCMCustomerService();
             $fcmService->sendNotification(
                 $booking->user->firebaseTokens->token,  
                 'Booking Cancelled',
@@ -157,7 +158,7 @@ class BookingProviderController extends Controller
                 type: NotificationType::SUCCESS,
             ));
 
-            $fcmService = new FCMService();
+            $fcmService = new FCMCustomerService();
             $fcmService->sendNotification(
                 $booking->user->firebaseTokens->token,  
                 'Booking Accepted',

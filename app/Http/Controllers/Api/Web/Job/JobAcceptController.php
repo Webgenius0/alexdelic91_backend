@@ -9,6 +9,7 @@ use App\Services\FCMService;
 use Illuminate\Http\Request;
 use App\Enum\NotificationType;
 use App\Http\Controllers\Controller;
+use App\Services\FCMCustomerService;
 use App\Notifications\NewNotification;
 use Illuminate\Support\Facades\Validator;
 
@@ -64,7 +65,7 @@ class JobAcceptController extends Controller
             type: NotificationType::SUCCESS,
         ));
 
-        $fcmService = new FCMService();
+        $fcmService = new FCMCustomerService();
             $fcmService->sendNotification(
                 $data->user->firebaseTokens->token,  
                 'Job Booked',
