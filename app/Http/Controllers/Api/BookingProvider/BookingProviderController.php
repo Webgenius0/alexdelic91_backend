@@ -135,7 +135,6 @@ class BookingProviderController extends Controller
                 $booking->user->firebaseTokens->token,  
                 'Booking Cancelled',
                 'Your booking has been cancelled',
-                ['booking_id' => $booking->id]
             );
 
         } catch (CustomException $e) {
@@ -163,7 +162,6 @@ class BookingProviderController extends Controller
                 $booking->user->firebaseTokens->token,  
                 'Booking Accepted',
                 'Your booking has been accepted',
-                ['booking_id' => $booking->id]
             );
 
         } catch (CustomException $e) {

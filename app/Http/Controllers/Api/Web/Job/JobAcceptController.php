@@ -69,7 +69,6 @@ class JobAcceptController extends Controller
                 $data->user->firebaseTokens->token,  
                 'Job Booked',
                 'Your job has been accepted',
-                ['booking_id' => $data->id]
             );
 
         return $this->success($data, 'Job accepted successfully', 200);
