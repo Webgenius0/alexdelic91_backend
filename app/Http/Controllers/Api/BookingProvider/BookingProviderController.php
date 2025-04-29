@@ -38,12 +38,16 @@ class BookingProviderController extends Controller
 
             // Collect all tokens
             $tokens = $booking->serviceProvider->firebaseTokens->pluck('token')->toArray();
+
             $fcmService = new FCMService();
-            $fcmService->sendNotification(
-                $tokens, // array of tokens
-                'Booking Request',
-                'You have a new booking',
-            );
+            
+            foreach ($tokens as $token) {
+                $fcmService->sendNotification(
+                    $token, 
+                    'Booking Request',
+                    'You have a new booking',
+                );
+            }
             return $this->success($booking, 'Booking created successfully', 201);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
