@@ -1,16 +1,15 @@
 <?php
-
 namespace App\Http\Controllers\Api\BookingProvider;
 
-use App\Traits\ApiResponse;
-use App\Services\FCMService;
-use Illuminate\Http\Request;
 use App\Enum\NotificationType;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingRequest;
-use App\Notifications\NewNotification;
 use App\Interface\BookingProviderInterface;
+use App\Notifications\NewNotification;
+use App\Services\FCMService;
+use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 
 class BookingProviderController extends Controller
 {
@@ -37,9 +36,11 @@ class BookingProviderController extends Controller
                 type: NotificationType::SUCCESS,
             ));
 
+            // Collect all tokens
+            $tokens = $booking->serviceProvider->firebaseTokens->pluck('token')->toArray();
             $fcmService = new FCMService();
             $fcmService->sendNotification(
-                $booking->serviceProvider->firebaseTokens->token,  
+                $tokens, // array of tokens
                 'Booking Request',
                 'You have a new booking',
             );
@@ -132,7 +133,7 @@ class BookingProviderController extends Controller
 
             $fcmService = new FCMService();
             $fcmService->sendNotification(
-                $booking->user->firebaseTokens->token,  
+                $booking->user->firebaseTokens->token,
                 'Booking Cancelled',
                 'Your booking has been cancelled',
             );
@@ -159,7 +160,7 @@ class BookingProviderController extends Controller
 
             $fcmService = new FCMService();
             $fcmService->sendNotification(
-                $booking->user->firebaseTokens->token,  
+                $booking->user->firebaseTokens->token,
                 'Booking Accepted',
                 'Your booking has been accepted',
             );
