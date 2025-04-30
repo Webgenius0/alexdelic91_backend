@@ -126,7 +126,7 @@ class ChatController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'message' => 'required_without|string',
-            'file' => 'required_without:message|file|mimes:png,jpg,jpeg,webp|max:2048',
+            'file' => 'required_without:message|file|mimes:png,jpg,jpeg,webp,pdf|max:5120',
             'chat_type' => 'required|string|in:direct,job_post',
         ]);
         if ($validator->fails()) {
