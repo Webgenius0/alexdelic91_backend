@@ -55,66 +55,80 @@ class ChatController extends Controller
     // get single chat details
     public function chat($user_id, Request $request)
     {
+        $authUser = auth()->user();
+        $chatType = $request->get('chat_type', 'direct');
+        $jobPostId = $request->get('job_post_id');
+        $perPage = $request->get('per_page', 1000);
+        $page = $request->get('page', 1);
 
-        // Find the user by ID
         $user = User::find($user_id);
         if (!$user) {
             return $this->error([], "User not found", 404);
         }
 
-        // Get pagination parameters from the request
-        $perPage = request()->get('per_page', 1000);
-        $page = request()->get('page', 1);
-
-        //job post
-        $job_post_id = $request->get('job_post_id');
-        if ($job_post_id) {
+        $jobPost = null;
+        if ($chatType === 'job_post' && $jobPostId) {
             $jobPost = JobPost::with([
                 'category:id,category_name',
                 'subcategory:id,subcategory_name',
                 'user',
-            ])->find($job_post_id);
+            ])->find($jobPostId);
+
+            if (!$jobPost) {
+                return $this->error([], "Job post not found", 404);
+            }
         }
 
-        // Fetch the conversation with the specified user (make sure to load participants)
-        $conversation = auth()->user()->conversations()
+        // Fetch conversation if it exists
+        $conversationQuery = $authUser->conversations()
             ->whereHas('participants', function ($query) use ($user) {
                 $query->where('participantable_id', $user->id);
             })
-            ->first();
+            ->where('chat_type', $chatType);
+
+        if ($chatType === 'job_post' && $jobPostId) {
+            $conversationQuery->where('job_post_id', $jobPostId);
+        }
+
+        $conversation = $conversationQuery->first();
 
         if (!$conversation) {
-            $auth = auth()->user();
-            $conversation = $auth->createConversationWith($user );
-//            return $this->success([], "New Conversation created", 201);
+            return  $this->error([], "Conversation not found", 200);
+            if ($chatType === 'job_post' && $jobPost) {
+                $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
+                $conversation->update([
+                    'chat_type' => 'job_post',
+                    'job_post_id' => $jobPostId,
+                ]);
+            } else {
+                $conversation = $authUser->createConversationWith($user);
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => "New Conversation created",
+                'message' => "New conversation created",
                 'conversation_id' => $conversation->id,
-                'job_post' => $jobPost ?? null,
+                'job_post' => $jobPost,
                 'data' => null,
                 'code' => 201
             ], 201);
         }
-        // Load the participants and any other necessary relationships
+
+        // Load messages and participants
         $conversation->load([
             'messages' => function ($query) use ($perPage, $page) {
-                $query->with(['attachment'])->latest()->paginate($perPage, ['*'], 'page', $page);
+                $query->with('attachment')->latest()->paginate($perPage, ['*'], 'page', $page);
             },
             'participants' => function ($query) {
                 $query->with('participantable');
             }
         ]);
 
-
-        // Return success response with the conversation and messages
-//        return $this->success(, "Chat fetched successfully", 200);
-
         return response()->json([
             'success' => true,
             'message' => "Chat fetched successfully",
             'conversation_id' => $conversation->id,
-            'job_post' => $jobPost ?? null,
+            'job_post' => $jobPost,
             'data' => ['conversation' => $conversation],
             'code' => 200
         ], 200);
@@ -122,10 +136,10 @@ class ChatController extends Controller
 
 
 
+
 // send message
     public function sendMessage(Request $request)
     {
-        // Get MIME types and max size from config
         $mediaMimes = config('wirechat.attachments.media_mimes', []);
         $fileMimes = config('wirechat.attachments.file_mimes', []);
         $maxUploadSize = max(
@@ -133,7 +147,6 @@ class ChatController extends Controller
             config('wirechat.attachments.file_max_upload_size', 1024)
         );
 
-// Validation
         $validator = Validator::make($request->all(), [
             'user_id' => ['required', 'exists:users,id'],
             'message' => ['required_without:file', 'string'],
@@ -141,89 +154,96 @@ class ChatController extends Controller
                 'required_without:message',
                 'file',
                 'mimes:' . implode(',', array_merge($mediaMimes, $fileMimes)),
-                'max:' . $maxUploadSize, // In kilobytes, so 12MB = 12288
+                'max:' . $maxUploadSize,
             ],
             'chat_type' => ['required', 'string', 'in:direct,job_post'],
             'job_post_id' => ['required_if:chat_type,job_post', 'exists:job_posts,id'],
         ]);
 
         if ($validator->fails()) {
-           return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), "Validation Error", 422);
         }
+
         DB::beginTransaction();
         try {
             $formUser = auth()->user();
             $toUser = User::find($request->user_id);
-            if ($formUser->id == $toUser->id) {
-                return $this->error([], "You can't chat with yourself", 404);
+
+            if (!$toUser || $formUser->id === $toUser->id) {
+                return $this->error([], "Invalid recipient", 404);
             }
-            if ($formUser && $toUser) {
 
-                if ($request->hasFile('file') && $request->file('file')->isValid() && $request->message == null) {
-                    $file = $request->file('file');
-                    $extension = $file->getClientOriginalExtension();
-                    $size = $file->getSize();
+            $conversation = null;
 
-                    $path = uploadImage($file, 'chat'); // This likely moves the file
+            if ($request->chat_type === 'job_post') {
+                $jobPost = JobPost::findOrFail($request->job_post_id);
 
-                    $conversation = $formUser->getConversationWith($toUser); // assume this returns or creates the conversation
-                    if (!$conversation) {
-                        $conversation = $formUser->createConversationWith($toUser);
-                    }
+                $conversation = $formUser->conversations()
+                    ->where('chat_type', 'job_post')
+                    ->where('job_post_id', $jobPost->id)
+                    ->where('type', 'group')
+                    ->first();
 
-                    $chat = $conversation->messages()->create([
-                        'sendable_type' => get_class(auth()->user()),
-                        'sendable_id' => auth()->id(),
-                        'type' => MessageType::ATTACHMENT,
-                    ]);
-
-
-                    $chat->attachment()->create([
-                        'file_path' => $path,
-                        'file_name' => basename($path),
-                        'original_name' => $file->getClientOriginalName(),
-                        'mime_type' => $file->getClientMimeType(),
-                        'url' => Storage::url($path),
-                        'type' => $extension,
-                        'size' => $size,
-                    ]);
-                }else{
-                    $message = $request->message;
-                    $chat = $formUser->sendMessageTo($toUser, $message);
+                if (!$conversation) {
+                    $conversation = $formUser->createGroup($jobPost->title . '-' . $toUser->name);
+                    $conversation->chat_type = 'job_post';
+                    $conversation->job_post_id = $jobPost->id;
+                    $conversation->save();
 
                 }
-                // Broadcast events after successful message creation
-                broadcast(new MessageCreated($chat));
-                broadcast(new NotifyParticipant($chat->conversation->participant($toUser), $chat));
+            } else {
+                $conversation = $formUser->hasConversationWith($toUser)
+                    ? $formUser->getConversationWith($toUser)
+                    : $formUser->createConversationWith($toUser);
+            }
 
-                //save the conversation type for showing specific messages
-                if ($request->chat_type == 'job_post'){
+            // Handle file or text message
+            if ($request->hasFile('file') && $request->file('file')->isValid()) {
+                $file = $request->file('file');
+                $extension = $file->getClientOriginalExtension();
+                $size = $file->getSize();
+                $path = uploadImage($file, 'chat');
 
-                    $conversation = CustomConversation::find($chat->conversation_id); //custom conversation extend the wire chat conversation
-                    if ($conversation){
-                        $conversation->update([
-                            'chat_type' => 'job_post'
-                        ]);
-
-
-
-                    }
-                }
-                $chat->conversation->load([
-                    'messages' => function ($query) {
-                        $query->with(['attachment'])->latest()->limit(1);
-                    },
-                    'participants' => function ($query) {
-                        $query->with('participantable');
-                    }
+                $chat = $conversation->messages()->create([
+                    'sendable_type' => get_class($formUser),
+                    'sendable_id' => $formUser->id,
+                    'type' => MessageType::ATTACHMENT,
                 ]);
-                DB::commit();
 
-                return $this->success($chat??[], "Message sent successfully", 200);
+                $chat->attachment()->create([
+                    'file_path' => $path,
+                    'file_name' => basename($path),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'url' => Storage::url($path),
+                    'type' => $extension,
+                    'size' => $size,
+                ]);
+            } else {
+                $chat = $conversation->messages()->create([
+                    'body' => $request->message,
+                    'sendable_type' => get_class($formUser),
+                    'sendable_id' => $formUser->id,
+                    'type' => MessageType::TEXT,
+                ]);
             }
 
-            return $this->error([], "User not found", 404);
-        }catch (\Exception $e) {
+            broadcast(new MessageCreated($chat));
+            $participant = $chat->conversation->participant($toUser);
+            if ($participant) {
+                broadcast(new NotifyParticipant($participant, $chat));
+            }
+
+
+            $chat->conversation->load([
+                'messages' => fn ($q) => $q->with('attachment')->latest()->limit(1),
+                'participants.participantable'
+            ]);
+
+            DB::commit();
+            return $this->success($chat, "Message sent successfully", 200);
+
+        } catch (\Exception $e) {
             DB::rollBack();
             return $this->error([], $e->getMessage(), 500);
         }

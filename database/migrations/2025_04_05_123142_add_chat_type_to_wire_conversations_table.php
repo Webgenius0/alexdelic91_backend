@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::table('wire_conversations', function (Blueprint $table) {
             $table->enum('chat_type', ['direct', 'job_post'])->default('direct')->after('type');
+            $table->foreignId('job_post_id')
+                ->nullable()
+                ->after('chat_type')
+                ->constrained('job_posts')
+                ->nullOnDelete();
+
         });
     }
 
@@ -23,6 +29,7 @@ return new class extends Migration
     {
         Schema::table('wire_conversations', function (Blueprint $table) {
             $table->dropColumn('chat_type');
+            $table->dropForeign(['job_post_id']);
         });
     }
 };
