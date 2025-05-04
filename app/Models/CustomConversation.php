@@ -8,5 +8,7 @@ class CustomConversation extends WireChatConversation
 {
     protected $fillable = [
         'chat_type',
+        'job_post_id'
+
     ];
 }
