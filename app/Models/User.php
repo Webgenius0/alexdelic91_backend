@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Chatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -143,4 +144,18 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(FirebaseToken::class);
     }
+
+    public function getConversationWith(User $otherUser): ?Conversation
+    {
+        return Conversation::whereHas('participants', function ($query) {
+            $query->where('participantable_id', $this->id)
+                ->where('participantable_type', self::class);
+        })
+            ->whereHas('participants', function ($query) use ($otherUser) {
+                $query->where('participantable_id', $otherUser->id)
+                    ->where('participantable_type', self::class);
+            })
+            ->first();
+    }
+
 }
