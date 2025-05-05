@@ -34,17 +34,23 @@ class ChatController extends Controller
             return $this->error($validator->errors(),$validator->errors()->first(), 400); // Return error if validation fails
         }
 
-
         $user = auth()->user();
         $chatQuery = $user->conversations()
             ->with(['participants' => function ($query) use ($user) {
-                $query->with('participantable:id,name,avatar')->where('participantable_id', '!=', auth()->id());
+                $query->with('participantable:id,name,avatar');
+//                $query->with('participantable:id,name,avatar')->where('participantable_id', '!=', auth()->id()); //without auth user
 
-            }, 'lastMessage']);
+            }, 'lastMessage' => function ($query) {
+                $query->with('attachment');
+            }]);
 
         // Apply chat_type filter if provided, including NULL
         if ($request->has('chat_type')) {
             $chatQuery->where('chat_type', $request->chat_type);
+
+            if ($request->chat_type === 'job_post') {
+                $chatQuery->with(['group']);
+            }
         }
 
         $chat = $chatQuery->get();
@@ -88,30 +94,33 @@ class ChatController extends Controller
 
         if ($chatType === 'job_post' && $jobPostId) {
             $conversationQuery->where('job_post_id', $jobPostId);
+
+            $conversationQuery->with(['group']);
         }
+
 
         $conversation = $conversationQuery->first();
 
         if (!$conversation) {
             return  $this->error([], "Conversation not found", 200);
-            if ($chatType === 'job_post' && $jobPost) {
-                $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
-                $conversation->update([
-                    'chat_type' => 'job_post',
-                    'job_post_id' => $jobPostId,
-                ]);
-            } else {
-                $conversation = $authUser->createConversationWith($user);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => "New conversation created",
-                'conversation_id' => $conversation->id,
-                'job_post' => $jobPost,
-                'data' => null,
-                'code' => 201
-            ], 201);
+//            if ($chatType === 'job_post' && $jobPost) {
+//                $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
+//                $conversation->update([
+//                    'chat_type' => 'job_post',
+//                    'job_post_id' => $jobPostId,
+//                ]);
+//            } else {
+//                $conversation = $authUser->createConversationWith($user);
+//            }
+//
+//            return response()->json([
+//                'success' => true,
+//                'message' => "New conversation created",
+//                'conversation_id' => $conversation->id,
+//                'job_post' => $jobPost,
+//                'data' => null,
+//                'code' => 201
+//            ], 201);
         }
 
         // Load messages and participants
@@ -185,16 +194,21 @@ class ChatController extends Controller
                     ->first();
 
                 if (!$conversation) {
-                    $conversation = $formUser->createGroup($jobPost->title . '-' . $toUser->name);
+                    $conversation = $formUser->createGroup($jobPost->title . '-' . $toUser->name,$jobPost->user?->avatar);
                     $conversation->chat_type = 'job_post';
                     $conversation->job_post_id = $jobPost->id;
                     $conversation->save();
+                    $conversation->addParticipant($toUser);
 
                 }
             } else {
                 $conversation = $formUser->hasConversationWith($toUser)
                     ? $formUser->getConversationWith($toUser)
                     : $formUser->createConversationWith($toUser);
+
+                if (!$conversation->participants->contains('participantable_id', $toUser->id)) {
+                    $conversation->addParticipant($toUser);
+                }
             }
 
             // Handle file or text message
