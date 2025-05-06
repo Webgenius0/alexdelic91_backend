@@ -193,8 +193,7 @@ class BookingProviderRepository implements BookingProviderInterface
 
         $user = auth()->user();
 
-        $booking = Booking::where('service_provider_id', $user->id)
-            ->where('id', $id)
+        $booking = Booking::where('id', $id)
             ->first();
 
         if (!$booking) {

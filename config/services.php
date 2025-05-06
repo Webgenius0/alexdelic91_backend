@@ -31,7 +31,8 @@ return [
 
 
     'firebase' => [
-        'credentials_file' => storage_path('app/my-firast-project-firebase-adminsdk-fbsvc-3c6330591a.json')
+        'credentials_file' => storage_path('app/instant-business-2da86-c6675edb8bd4.json'),
+        'customer_credentials_file' => storage_path('app/instant-help-7995f-f898b72fb87f.json')
     ],
 
 

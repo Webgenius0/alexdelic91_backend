@@ -28,7 +28,7 @@ class FirebaseTokenController extends Controller
         $token = $request->token;
         $device_id = $request->device_id;
 
-        $firebaseToken = FirebaseToken::where('device_id', $device_id)->first();
+        $firebaseToken = FirebaseToken::where('device_id', $device_id)->where('user_id', $user->id)->first();
 
         if ($firebaseToken) {
             $firebaseToken->update([

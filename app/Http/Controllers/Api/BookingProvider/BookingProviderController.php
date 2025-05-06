@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\BookingProvider;
 
 use App\Traits\ApiResponse;
+use App\Services\FCMService;
 use Illuminate\Http\Request;
 use App\Enum\NotificationType;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
+use App\Services\FCMCustomerService;
 use App\Http\Requests\BookingRequest;
 use App\Notifications\NewNotification;
 use App\Interface\BookingProviderInterface;
@@ -30,10 +32,18 @@ class BookingProviderController extends Controller
         try {
             $booking = $this->bookingProviderInterface->book($request->validated());
             $booking->serviceProvider->notify(new NewNotification(
+                subject: 'Booking Request',
                 message: 'You have a new booking',
                 channels: ['database'],
                 type: NotificationType::SUCCESS,
             ));
+
+            $fcmService = new FCMService();
+            $fcmService->sendMessage(
+                $booking->serviceProvider->firebaseTokens->token, 
+                'Booking Request',
+                'You have a new booking',
+            );
             return $this->success($booking, 'Booking created successfully', 201);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
@@ -115,10 +125,18 @@ class BookingProviderController extends Controller
             return $this->success($booking, 'Booking cancelled successfully', 200);
 
             $booking->user->notify(new NewNotification(
+                subject: 'Booking Cancelled',
                 message: 'Your booking has been cancelled',
                 channels: ['database'],
                 type: NotificationType::SUCCESS,
             ));
+
+            $fcmService = new FCMCustomerService();
+            $fcmService->sendNotification(
+                $booking->user->firebaseTokens->token,  
+                'Booking Cancelled',
+                'Your booking has been cancelled',
+            );
 
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
@@ -139,6 +157,13 @@ class BookingProviderController extends Controller
                 channels: ['database'],
                 type: NotificationType::SUCCESS,
             ));
+
+            $fcmService = new FCMCustomerService();
+            $fcmService->sendNotification(
+                $booking->user->firebaseTokens->token,  
+                'Booking Accepted',
+                'Your booking has been accepted',
+            );
 
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());

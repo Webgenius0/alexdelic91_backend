@@ -41,6 +41,8 @@ class UserController extends Controller
 
         if ($data->feedbacks_avg_rating !== null) {
             $data->feedbacks_avg_rating = round($data->feedbacks_avg_rating, 1);
+        }else{
+            $data->feedbacks_avg_rating = 0;
         }
 
         return $this->success($data, 'User data fetched successfully', 200);

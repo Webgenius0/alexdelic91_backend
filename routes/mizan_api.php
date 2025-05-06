@@ -10,6 +10,12 @@ use App\Http\Controllers\Api\User\ServiceProviderController;
 use App\Http\Controllers\Api\Provider\NotificationSettingController;
 
 Route::group(['middleware' => ['jwt.verify']], function () {
+
+    Route::controller(NotificationSettingController::class)->group(function () {
+        Route::post('/notifications-setting', 'notificationsSetting');
+        Route::get('/notifications-setting', 'getNotificationsSetting');
+    });
+    
     Route::group(['middleware' => ['customer']], function() {
 
         //Bookmarks route--------
@@ -65,10 +71,6 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::post('/job-accept/{id}', 'jobAccept');
         });
 
-        Route::controller(NotificationSettingController::class)->group(function () {
-            Route::post('/notifications-setting', 'notificationsSetting');
-            Route::get('/notifications-setting', 'getNotificationsSetting');
-        });
     });
 
 });
