@@ -39,7 +39,7 @@ class BookingProviderController extends Controller
             ));
 
             $fcmService = new FCMService();
-            $fcmService->sendNotification(
+            $fcmService->sendMessage(
                 $booking->serviceProvider->firebaseTokens->token, 
                 'Booking Request',
                 'You have a new booking',

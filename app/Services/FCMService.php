@@ -11,7 +11,7 @@ class FCMService{
         $this->messaging = $factory->createMessaging();
     }
 
-    public function sendNotification($token, $title, $body, $data = [])
+    public function sendMessage($token, $title, $body, $data = [])
     {
         $message = [
             'token' => $token,
