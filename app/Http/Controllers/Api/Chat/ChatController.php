@@ -27,7 +27,7 @@ class ChatController extends Controller
             'chat_type' => 'nullable|in:direct,job_post',
         ]);
         if ($validator->fails()) {
-            return $this->error($validator->errors(),$validator->errors()->first(), 400); // Return error if validation fails
+            return $this->error($validator->errors(), $validator->errors()->first(), 400); // Return error if validation fails
         }
 
 
@@ -35,7 +35,6 @@ class ChatController extends Controller
         $chatQuery = $user->conversations()
             ->with(['participants' => function ($query) use ($user) {
                 $query->with('participantable:id,name,avatar')->where('participantable_id', '!=', auth()->id());
-
             }, 'lastMessage']);
 
         // Apply chat_type filter if provided, including NULL
@@ -70,8 +69,8 @@ class ChatController extends Controller
 
         if (!$conversation) {
             $auth = auth()->user();
-            $conversation = $auth->createConversationWith($user );
-//            return $this->success([], "New Conversation created", 201);
+            $conversation = $auth->createConversationWith($user);
+            //            return $this->success([], "New Conversation created", 201);
             return response()->json([
                 'success' => true,
                 'message' => "New Conversation created",
@@ -93,20 +92,20 @@ class ChatController extends Controller
         ]);
 
         // Return success response with the conversation and messages
-//        return $this->success(, "Chat fetched successfully", 200);
+        //        return $this->success(, "Chat fetched successfully", 200);
 
         return response()->json([
             'success' => true,
             'message' => "Chat fetched successfully",
             'conversation_id' => $conversation->id,
-            'data' => ['conversation' => $conversation,'messages' => $messages],
+            'data' => ['conversation' => $conversation, 'messages' => $messages],
             'code' => 200
         ], 200);
     }
 
 
 
-// send message
+    // send message
     public function sendMessage(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -116,7 +115,7 @@ class ChatController extends Controller
             'chat_type' => 'required|string|in:direct,job_post',
         ]);
         if ($validator->fails()) {
-           return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), "Validation Error", 422);
         }
         DB::beginTransaction();
         try {
@@ -127,8 +126,8 @@ class ChatController extends Controller
             }
             $message = $request->message;
             if ($formUser && $toUser) {
-                if($request->hasFile('file') && $request->file('file')->isValid() && $request->message == null){
-                    $message= uploadImage($request->file('file'), 'chat',);
+                if ($request->hasFile('file') && $request->file('file')->isValid() && $request->message == null) {
+                    $message = uploadImage($request->file('file'), 'chat',);
                 }
                 $chat = $formUser->sendMessageTo($toUser, $message);
                 // Broadcast events after successful message creation
@@ -136,27 +135,24 @@ class ChatController extends Controller
                 broadcast(new NotifyParticipant($chat->conversation->participant($toUser), $chat));
 
                 //save the conversation type for showing specific messages
-                if ($request->chat_type == 'job_post'){
+                if ($request->chat_type == 'job_post') {
 
                     $conversation = CustomConversation::find($chat->conversation_id); //custom conversation extend the wire chat conversation
-                    if ($conversation){
+                    if ($conversation) {
                         $conversation->update([
                             'chat_type' => 'job_post'
                         ]);
-
                     }
                 }
                 DB::commit();
 
-                return $this->success($chat??[], "Message sent successfully", 200);
+                return $this->success($chat ?? [], "Message sent successfully", 200);
             }
 
             return $this->error([], "User not found", 404);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return $this->error([], $e->getMessage(), 500);
         }
     }
-
-
 }
