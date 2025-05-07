@@ -50,11 +50,13 @@ class ServiceProviderProfile extends Model
         return $this->hasMany(Booking::class, 'service_provider_id');
     }
 
-    public function bookingDataAndTime(){
+    public function bookingDataAndTime()
+    {
         return $this->hasMany(Booking::class, 'service_provider_id');
     }
 
-    public function category() {
+    public function category()
+    {
         return $this->hasOne(Category::class, 'id', 'category_id');
     }
     public function subCategories()
@@ -72,5 +74,4 @@ class ServiceProviderProfile extends Model
     {
         return $this->hasMany(OtherCategory::class);
     }
-
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookMark;
+use App\Models\ServiceProviderProfile;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 

@@ -31,7 +31,7 @@ class ChatController extends Controller
             'chat_type' => 'nullable|in:direct,job_post',
         ]);
         if ($validator->fails()) {
-            return $this->error($validator->errors(),$validator->errors()->first(), 400); // Return error if validation fails
+            return $this->error($validator->errors(), $validator->errors()->first(), 400); // Return error if validation fails
         }
 
         $user = auth()->user();
@@ -146,7 +146,7 @@ class ChatController extends Controller
 
 
 
-// send message
+    // send message
     public function sendMessage(Request $request)
     {
         $mediaMimes = config('wirechat.attachments.media_mimes', []);
@@ -262,6 +262,4 @@ class ChatController extends Controller
             return $this->error([], $e->getMessage(), 500);
         }
     }
-
-
 }

@@ -29,7 +29,7 @@ class JobPostController extends Controller
 
             // $fcmService = new FCMService();
             // $fcmService->sendNotification(
-            //     $jobpost->user->firebaseTokens->token,  
+            //     $jobpost->user->firebaseTokens->token,
             //     'Job Post',
             //     'You have a new job post',
             //     ['job_post_id' => $jobpost->id]
@@ -135,10 +135,10 @@ class JobPostController extends Controller
         }
     }
 
-    public function jobPostEdit(JobPostRequest $request,$id)
+    public function jobPostEdit(JobPostRequest $request, $id)
     {
         try {
-            $jobpost = $this->JobPostRepositoryInterface->jobPostEdit($request->validated(),$id);
+            $jobpost = $this->JobPostRepositoryInterface->jobPostEdit($request->validated(), $id);
             return $this->success($jobpost, 'Job post updated successfully', 200);
         } catch (CustomException $e) {
             return $this->error([], $e->getMessage(), $e->getCode());
