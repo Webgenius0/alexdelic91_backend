@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Repositories;
 
 use App\Exceptions\CustomException;
 use App\Interface\JobPostRepositoryInterface;
+use App\Models\Booking;
 use App\Models\JobPost;
 use App\Models\User;
 use App\Traits\ApiResponse;
@@ -276,7 +276,7 @@ class JobPostRepository implements JobPostRepositoryInterface
 
             DB::beginTransaction();
 
-            $job = JobPost::where('id',$id)->where('user_id', $user->id)->first();
+            $job = JobPost::where('id', $id)->where('user_id', $user->id)->first();
 
             if (! $job) {
                 throw new CustomException("Job post not found", 200);
@@ -317,14 +317,24 @@ class JobPostRepository implements JobPostRepositoryInterface
 
     public function jobPostCancel($id)
     {
+       
         $job = JobPost::where('id', $id)->first();
 
-        $job->update([
-            'status' => 'cancelled',
-        ]);
-        if (! $job) {
-            throw new CustomException("Job post not found", 200);
+        if ($job) {
+            $job->update([
+                'status' => 'cancelled',
+            ]);
         }
+
+        $bookings = Booking::where('job_post_id', $id)->get();
+
+        foreach ($bookings as $booking) {
+            $booking->update([
+                'status' => 'cancelled',
+            ]);
+        }
+
         return $job;
     }
+
 }
