@@ -112,7 +112,15 @@ class ChatController extends Controller
             } else {
                 $conversation = $authUser->createConversationWith($user);
             }
-
+            // Load messages and participants
+            $conversation->load([
+                'messages' => function ($query) use ($perPage, $page) {
+                    $query->with('attachment')->latest()->paginate($perPage, ['*'], 'page', $page);
+                },
+                'participants' => function ($query) {
+                    $query->with('participantable');
+                }
+            ]);
             return response()->json([
                 'success' => true,
                 'message' => "New conversation created",
