@@ -102,25 +102,25 @@ class ChatController extends Controller
         $conversation = $conversationQuery->first();
 
         if (!$conversation) {
-            return  $this->error([], "Conversation not found", 200);
-//            if ($chatType === 'job_post' && $jobPost) {
-//                $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
-//                $conversation->update([
-//                    'chat_type' => 'job_post',
-//                    'job_post_id' => $jobPostId,
-//                ]);
-//            } else {
-//                $conversation = $authUser->createConversationWith($user);
-//            }
-//
-//            return response()->json([
-//                'success' => true,
-//                'message' => "New conversation created",
-//                'conversation_id' => $conversation->id,
-//                'job_post' => $jobPost,
-//                'data' => null,
-//                'code' => 201
-//            ], 201);
+//            return  $this->error([], "Conversation not found", 200);
+            if ($chatType === 'job_post' && $jobPost) {
+                $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
+                $conversation->update([
+                    'chat_type' => 'job_post',
+                    'job_post_id' => $jobPostId,
+                ]);
+            } else {
+                $conversation = $authUser->createConversationWith($user);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "New conversation created",
+                'conversation_id' => $conversation->id,
+                'job_post' => $jobPost,
+                'data' => null,
+                'code' => 201
+            ], 201);
         }
 
         // Load messages and participants
