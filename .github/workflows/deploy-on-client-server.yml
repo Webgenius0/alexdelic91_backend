@@ -14,6 +14,23 @@ jobs:
       - name: FTP-Deploy-Action
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
-          server: 82.29.184.44
-          username: adam
-          password: "123456@#adam"
+          server: ftp.softvencefsd.xyz
+          username: alexdelic91@alexdelic91.softvencefsd.xyz
+          password: "softvencefsd_alexdelic91"
+
+  Deploy-Trekarius:
+      name: Deploy to Trekarius Server
+      runs-on: ubuntu-latest
+      if: github.ref == 'refs/heads/deploy'
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 2
+
+        - name: FTP-Deploy-Action
+          uses: SamKirkland/FTP-Deploy-Action@4.3.0
+          with:
+            server: 82.29.184.44
+            username: adam
+            password: "123456@#adam"
