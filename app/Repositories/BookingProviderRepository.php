@@ -54,6 +54,7 @@ class BookingProviderRepository implements BookingProviderInterface
             'latitude' => $data['latitude'],
             'longitude' => $data['longitude'],
             'notes' => $data['notes'],
+            'status' => 'booked',
         ]);
 
         return $booking;
