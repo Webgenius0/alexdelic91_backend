@@ -87,6 +87,8 @@ class ChatController extends Controller
 
         // Fetch conversation if it exists
         $conversationQuery = $authUser->conversations()
+
+
             ->whereHas('participants', function ($query) use ($user) {
                 $query->where('participantable_id', $user->id);
             })
@@ -94,7 +96,6 @@ class ChatController extends Controller
 
         if ($chatType === 'job_post' && $jobPostId) {
             $conversationQuery->where('job_post_id', $jobPostId);
-
             $conversationQuery->with(['group']);
         }
 
@@ -105,10 +106,12 @@ class ChatController extends Controller
 //            return  $this->error([], "Conversation not found", 200);
             if ($chatType === 'job_post' && $jobPost) {
                 $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
-                $conversation->update([
-                    'chat_type' => 'job_post',
-                    'job_post_id' => $jobPostId,
-                ]);
+
+                $conversation->chat_type = 'job_post';
+                $conversation->job_post_id = $jobPost->id;
+                $conversation->save();
+                $conversation->addParticipant($user);
+
             } else {
                 $conversation = $authUser->createConversationWith($user);
             }
@@ -119,14 +122,15 @@ class ChatController extends Controller
                 },
                 'participants' => function ($query) {
                     $query->with('participantable');
-                }
+                },
+                'group'
             ]);
             return response()->json([
                 'success' => true,
                 'message' => "New conversation created",
                 'conversation_id' => $conversation->id,
                 'job_post' => $jobPost,
-                'data' => null,
+                'data' => $conversation,
                 'code' => 201
             ], 201);
         }
