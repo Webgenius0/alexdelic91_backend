@@ -1,0 +1,15 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.instanthelp.app",
+            "sha256_cert_fingerprints": [
+                "F5:90:EB:C3:98:5F:3B:2B:46:73:B6:12:02:13:29:1A:70:9C:1F:7D:95:CC:B4:CB:F7:28:A2:79:1A:7E:65:FB",
+                "E8:48:D0:6D:57:9E:E7:CA:02:61:6A:59:EF:B7:8E:B8:8A:E9:5A:53:90:83:47:99:CF:67:EF:A2:1A:B2:9F:EA"
+            ]
+        }
+    }
+]
