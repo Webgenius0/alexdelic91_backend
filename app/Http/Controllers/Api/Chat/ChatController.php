@@ -214,13 +214,23 @@ class ChatController extends Controller
 
                 }
             } else {
-                $conversation = $formUser->hasConversationWith($toUser)
-                    ? $formUser->getConversationWith($toUser)
-                    : $formUser->createConversationWith($toUser);
+                $conversation = $formUser->conversations()
+                    ->where('chat_type', 'direct')
+                    ->whereHas('participants', function ($query) use ($toUser) {
+                        $query->where('participantable_id', $toUser->id);
+                    })
+                    ->first();
+
+                if (!$conversation) {
+                    $conversation = $formUser->createConversationWith($toUser);
+                    $conversation->chat_type = 'direct';
+                    $conversation->save();
+                }
 
                 if (!$conversation->participants->contains('participantable_id', $toUser->id)) {
                     $conversation->addParticipant($toUser);
                 }
+
             }
 
             // Handle file or text message
@@ -265,6 +275,7 @@ class ChatController extends Controller
                 'messages' => fn ($q) => $q->with('attachment')->latest()->limit(1),
                 'participants.participantable'
             ]);
+//            dd($conversation);
 
             DB::commit();
             return $this->success($chat, "Message sent successfully", 200);
