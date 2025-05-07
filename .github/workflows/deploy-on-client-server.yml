@@ -14,6 +14,6 @@ jobs:
       - name: FTP-Deploy-Action
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
-          server: ftp.softvencefsd.xyz
-          username: alexdelic91@alexdelic91.softvencefsd.xyz
-          password: "softvencefsd_alexdelic91"
+          server: 82.29.184.44
+          username: adam
+          password: "123456@#adam"
