@@ -87,6 +87,8 @@ class ChatController extends Controller
 
         // Fetch conversation if it exists
         $conversationQuery = $authUser->conversations()
+
+
             ->whereHas('participants', function ($query) use ($user) {
                 $query->where('participantable_id', $user->id);
             })
@@ -94,7 +96,6 @@ class ChatController extends Controller
 
         if ($chatType === 'job_post' && $jobPostId) {
             $conversationQuery->where('job_post_id', $jobPostId);
-
             $conversationQuery->with(['group']);
         }
 
@@ -105,20 +106,31 @@ class ChatController extends Controller
 //            return  $this->error([], "Conversation not found", 200);
             if ($chatType === 'job_post' && $jobPost) {
                 $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
-                $conversation->update([
-                    'chat_type' => 'job_post',
-                    'job_post_id' => $jobPostId,
-                ]);
+
+                $conversation->chat_type = 'job_post';
+                $conversation->job_post_id = $jobPost->id;
+                $conversation->save();
+                $conversation->addParticipant($user);
+
             } else {
                 $conversation = $authUser->createConversationWith($user);
             }
-
+            // Load messages and participants
+            $conversation->load([
+                'messages' => function ($query) use ($perPage, $page) {
+                    $query->with('attachment')->latest()->paginate($perPage, ['*'], 'page', $page);
+                },
+                'participants' => function ($query) {
+                    $query->with('participantable');
+                },
+                'group'
+            ]);
             return response()->json([
                 'success' => true,
                 'message' => "New conversation created",
                 'conversation_id' => $conversation->id,
                 'job_post' => $jobPost,
-                'data' => null,
+                'data' => $conversation,
                 'code' => 201
             ], 201);
         }
@@ -202,13 +214,23 @@ class ChatController extends Controller
 
                 }
             } else {
-                $conversation = $formUser->hasConversationWith($toUser)
-                    ? $formUser->getConversationWith($toUser)
-                    : $formUser->createConversationWith($toUser);
+                $conversation = $formUser->conversations()
+                    ->where('chat_type', 'direct')
+                    ->whereHas('participants', function ($query) use ($toUser) {
+                        $query->where('participantable_id', $toUser->id);
+                    })
+                    ->first();
+
+                if (!$conversation) {
+                    $conversation = $formUser->createConversationWith($toUser);
+                    $conversation->chat_type = 'direct';
+                    $conversation->save();
+                }
 
                 if (!$conversation->participants->contains('participantable_id', $toUser->id)) {
                     $conversation->addParticipant($toUser);
                 }
+
             }
 
             // Handle file or text message
@@ -253,6 +275,7 @@ class ChatController extends Controller
                 'messages' => fn ($q) => $q->with('attachment')->latest()->limit(1),
                 'participants.participantable'
             ]);
+//            dd($conversation);
 
             DB::commit();
             return $this->success($chat, "Message sent successfully", 200);
