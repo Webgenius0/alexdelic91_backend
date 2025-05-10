@@ -14,3 +14,5 @@ Route::controller(NotificationController::class)->group(function () {
 
 });
 
+// this route or deep linking
+Route::get('/p/{id}', [PageController::class, 'deepLinking']);

@@ -22,4 +22,7 @@ class PageController extends Controller
                         ->firstOrFail();
         return view('frontend.layouts.pages.singleDynamicPage', compact('dynamicPage'));
     }
+    public function deepLinking() {
+        return view('frontend.layouts.pages.deepLinking');
+    }
 }
