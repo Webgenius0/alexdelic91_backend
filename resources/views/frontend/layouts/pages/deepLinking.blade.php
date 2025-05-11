@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <style>
         body {
+            padding:  0 120px;
             margin: 0;
             height: 100vh;
             display: flex;
@@ -23,7 +24,7 @@
         }
 
         h1 {
-            font-size: 10rem;
+            font-size: 4rem;
             text-transform: uppercase;
             letter-spacing: 10px;
             color: white;
@@ -107,7 +108,7 @@
 </head>
 <body>
 <div class="wrapper">
-    <h1>instant</h1>
+    <h1>Download the app from app store and play store</h1>
 </div>
 </body>
 </html>
