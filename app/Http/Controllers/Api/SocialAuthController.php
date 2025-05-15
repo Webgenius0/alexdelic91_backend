@@ -130,6 +130,11 @@ class SocialAuthController extends Controller
                 }
             }
 
+            // verify email if not verified for chating
+            $user->update([
+                'email_verified_at' => now(),
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'User authenticated successfully',
