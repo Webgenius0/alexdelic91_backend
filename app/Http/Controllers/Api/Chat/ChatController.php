@@ -42,18 +42,29 @@ class ChatController extends Controller
 
             }, 'lastMessage' => function ($query) {
                 $query->with('attachment');
-            }]);
+            },'group']);
 
-        // Apply chat_type filter if provided, including NULL
-        if ($request->has('chat_type')) {
-            $chatQuery->where('chat_type', $request->chat_type);
-
-            if ($request->chat_type === 'job_post') {
-                $chatQuery->with(['group']);
-            }
-        }
+//        // Apply chat_type filter if provided, including NULL
+//        if ($request->has('chat_type')) {
+//            $chatQuery->where('chat_type', $request->chat_type);
+//
+//            if ($request->chat_type === 'job_post') {
+//                $chatQuery->with(['group']);
+//            }
+//        }
 
         $chat = $chatQuery->get();
+        //add job post
+        $chat->map(function ($item) {
+            if ($item->chat_type === 'job_post' && $item->job_post_id) {
+                $item->job_post = JobPost::with([
+                    'category:id,category_name',
+                    'subcategory:id,subcategory_name',
+                    'user',
+                ])->find($item->job_post_id);
+            }
+        });
+
 
 
         return $this->success($chat, "Chat list fetch successfully", 200);
@@ -182,7 +193,7 @@ class ChatController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error($validator->errors(), "Validation Error", 422);
+            return $this->error($validator->errors(), $validator->errors()->first(), 422);
         }
 
         DB::beginTransaction();
