@@ -271,7 +271,6 @@ class JobPostRepository implements JobPostRepositoryInterface
         if (! $user) {
             throw new CustomException("User Unauthorized", 401);
         }
-
         try {
 
             DB::beginTransaction();
@@ -295,14 +294,14 @@ class JobPostRepository implements JobPostRepositoryInterface
             ]);
 
             if (isset($data['date'])) {
-                foreach (($data['date']) as $date) {
+                $newDates = collect($data['date']);
+                $existingDates = $job->jobPostDates->pluck('date');
+                $datesToDelete = $existingDates->diff($newDates);
+                $job->jobPostDates()->whereIn('date', $datesToDelete)->delete();
+                foreach ($newDates as $date) {
                     $job->jobPostDates()->updateOrCreate(
-                        [
-                            'date' => $date,
-                        ],
-                        [
-                            'date' => $date,
-                        ]
+                        ['date' => $date],
+                        ['date' => $date]
                     );
                 }
             }
@@ -317,7 +316,7 @@ class JobPostRepository implements JobPostRepositoryInterface
 
     public function jobPostCancel($id)
     {
-       
+
         $job = JobPost::where('id', $id)->first();
 
         if ($job) {

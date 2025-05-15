@@ -59,7 +59,7 @@ class UserController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:5120',
+            'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:20480',
             'email'   => 'nullable|email|unique:users,email,' . auth()->user()->id,
             'address' => 'nullable|string',
             'name'    => 'nullable|string|max:255',
