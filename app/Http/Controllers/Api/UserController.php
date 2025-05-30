@@ -1,22 +1,24 @@
 <?php
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Day;
+use App\Models\User;
+use App\Models\Category;
+use App\Models\Subcategory;
+use App\Traits\ApiResponse;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Models\OtherCategory;
 use App\Models\ServiceLocation;
-use App\Models\ServiceProviderImage;
-use App\Models\ServiceProviderProfile;
-use App\Models\ServiceProviderSubcategory;
-use App\Models\ServiseProviderWorkDay;
-use App\Models\User;
-use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\Controller;
+use App\Models\ServiceProviderImage;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ServiceProviderProfile;
+use App\Models\ServiseProviderWorkDay;
+use Illuminate\Support\Facades\Validator;
+use App\Models\ServiceProviderSubcategory;
 
 class UserController extends Controller
 {
@@ -234,6 +236,18 @@ class UserController extends Controller
                         'images'              => $imageName,
                     ]);
                 }
+            }
+            
+            if($request->other) {
+                $other = Subcategory::create([
+                    'category_id'      => $request->category_id,
+                    'subcategory_name' => $request->other,
+                ]);
+
+                ServiceProviderSubcategory::create([
+                    'service_provider_id' => $service_provider->id,
+                    'subcategory_id'      => $other->id,
+                ]);
             }
 
             // Handle subcategories
