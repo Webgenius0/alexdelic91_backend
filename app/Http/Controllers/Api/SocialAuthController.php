@@ -113,6 +113,11 @@ class SocialAuthController extends Controller
                 }
             }
 
+            // verify email if not verified for chating
+            $user->update([
+                'email_verified_at' => now(),
+            ]);
+
             $message = $isNewUser ? 'User registered successfully' : 'User logged in successfully';
 
             // Generate JWT token
@@ -129,6 +134,7 @@ class SocialAuthController extends Controller
                     return $this->error([], 'Your are not a customer registered', 403);
                 }
             }
+
 
             return response()->json([
                 'success' => true,
