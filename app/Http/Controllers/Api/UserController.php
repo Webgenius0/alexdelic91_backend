@@ -61,7 +61,7 @@ class UserController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:20480',
+            'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:51200',
             'email'   => 'nullable|email|unique:users,email,' . auth()->user()->id,
             'address' => 'nullable|string',
             'name'    => 'nullable|string|max:255',
@@ -177,7 +177,7 @@ class UserController extends Controller
             'zip_code'            => 'nullable|string|max:255',
             'start_time'          => 'nullable|string',
             'end_time'            => 'nullable|string',
-            'images.*'            => 'nullable|image|mimes:png,jpg,jpeg',
+            'images.*'            => 'nullable|image|mimes:png,jpg,jpeg|max:51200',
             'subcategories'       => 'nullable|array',
             'subcategories.*'     => 'nullable|integer',
             'days'                => 'nullable|array',
