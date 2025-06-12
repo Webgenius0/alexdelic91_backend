@@ -83,8 +83,8 @@ class ServiceProviderController extends Controller
             'tiktok' => 'nullable|string|url',
             'website' => 'nullable|string|url',
             'description' => 'nullable|string',
-            'avatar' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
-            'images.*' => 'nullable|image|mimes:png,jpg,jpeg|max:4048',
+            'avatar' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:51200',
+            'images.*' => 'nullable|image|mimes:png,jpg,jpeg|max:51200',
         ]);
 
         if ($validator->fails()) {

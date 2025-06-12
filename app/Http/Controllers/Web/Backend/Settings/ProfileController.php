@@ -92,7 +92,7 @@ class ProfileController extends Controller {
     public function UpdateProfilePicture(Request $request) {
         try {
             $request->validate([
-                'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:4048',
+                'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:51200',
             ]);
 
             $user        = Auth::user();
