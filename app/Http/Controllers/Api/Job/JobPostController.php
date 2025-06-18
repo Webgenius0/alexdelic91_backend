@@ -152,19 +152,19 @@ class JobPostController extends Controller
         try {
             $jobpost = $this->JobPostRepositoryInterface->jobPostCancel($id);
 
-            // $jobpost->serviceProvider->notify(new NewNotification(
-            //     subject: 'Cancelled',
-            //     message: 'Your job post has been cancelled',
-            //     channels: ['database'],
-            //     type: NotificationType::SUCCESS,
-            // ));
+            $jobpost->serviceProvider->notify(new NewNotification(
+                subject: 'Cancelled',
+                message: 'Your job post has been cancelled',
+                channels: ['database'],
+                type: NotificationType::SUCCESS,
+            ));
 
-            // $fcmService = new FCMService();
-            // $fcmService->sendMessage(
-            //     $jobpost->serviceProvider->firebaseTokens->token, 
-            //     'Cancelled',
-            //     'Your job post has been cancelled',
-            // );
+            $fcmService = new FCMService();
+            $fcmService->sendMessage(
+                $jobpost->serviceProvider->firebaseTokens->token, 
+                'Cancelled',
+                'Your job post has been cancelled',
+            );
 
             return $this->success($jobpost, 'Job post cancelled successfully', 200);
         } catch (CustomException $e) {

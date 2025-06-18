@@ -1,22 +1,24 @@
 <?php
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Day;
+use App\Models\User;
+use App\Models\Category;
+use App\Models\Subcategory;
+use App\Traits\ApiResponse;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Models\OtherCategory;
 use App\Models\ServiceLocation;
-use App\Models\ServiceProviderImage;
-use App\Models\ServiceProviderProfile;
-use App\Models\ServiceProviderSubcategory;
-use App\Models\ServiseProviderWorkDay;
-use App\Models\User;
-use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\Controller;
+use App\Models\ServiceProviderImage;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ServiceProviderProfile;
+use App\Models\ServiseProviderWorkDay;
+use Illuminate\Support\Facades\Validator;
+use App\Models\ServiceProviderSubcategory;
 
 class UserController extends Controller
 {
@@ -59,7 +61,7 @@ class UserController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:20480',
+            'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,svg|max:51200',
             'email'   => 'nullable|email|unique:users,email,' . auth()->user()->id,
             'address' => 'nullable|string',
             'name'    => 'nullable|string|max:255',
@@ -175,7 +177,7 @@ class UserController extends Controller
             'zip_code'            => 'nullable|string|max:255',
             'start_time'          => 'nullable|string',
             'end_time'            => 'nullable|string',
-            'images.*'            => 'nullable|image|mimes:png,jpg,jpeg',
+            'images.*'            => 'nullable|image|mimes:png,jpg,jpeg|max:51200',
             'subcategories'       => 'nullable|array',
             'subcategories.*'     => 'nullable|integer',
             'days'                => 'nullable|array',
@@ -234,6 +236,18 @@ class UserController extends Controller
                         'images'              => $imageName,
                     ]);
                 }
+            }
+            
+            if($request->other) {
+                $other = Subcategory::create([
+                    'category_id'      => $request->category_id,
+                    'subcategory_name' => $request->other,
+                ]);
+
+                ServiceProviderSubcategory::create([
+                    'service_provider_id' => $service_provider->id,
+                    'subcategory_id'      => $other->id,
+                ]);
             }
 
             // Handle subcategories
