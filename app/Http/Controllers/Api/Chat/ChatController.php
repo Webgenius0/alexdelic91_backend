@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomConversation;
 use App\Models\JobPost;
 use App\Models\User;
+use App\Services\FCMCustomerService;
+use App\Services\FCMService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,20 +40,20 @@ class ChatController extends Controller
         $chatQuery = $user->conversations()
             ->with(['participants' => function ($query) use ($user) {
                 $query->with('participantable:id,name,avatar');
-//                $query->with('participantable:id,name,avatar')->where('participantable_id', '!=', auth()->id()); //without auth user
+                //                $query->with('participantable:id,name,avatar')->where('participantable_id', '!=', auth()->id()); //without auth user
 
             }, 'lastMessage' => function ($query) {
                 $query->with('attachment');
-            },'group']);
+            }, 'group']);
 
-//        // Apply chat_type filter if provided, including NULL
-//        if ($request->has('chat_type')) {
-//            $chatQuery->where('chat_type', $request->chat_type);
-//
-//            if ($request->chat_type === 'job_post') {
-//                $chatQuery->with(['group']);
-//            }
-//        }
+        //        // Apply chat_type filter if provided, including NULL
+        //        if ($request->has('chat_type')) {
+        //            $chatQuery->where('chat_type', $request->chat_type);
+        //
+        //            if ($request->chat_type === 'job_post') {
+        //                $chatQuery->with(['group']);
+        //            }
+        //        }
 
         $chat = $chatQuery->get();
         //add job post
@@ -114,7 +116,7 @@ class ChatController extends Controller
         $conversation = $conversationQuery->first();
 
         if (!$conversation) {
-//            return  $this->error([], "Conversation not found", 200);
+            //            return  $this->error([], "Conversation not found", 200);
             if ($chatType === 'job_post' && $jobPost) {
                 $conversation = $authUser->createGroup($jobPost->title . '-' . $user->name);
 
@@ -122,7 +124,6 @@ class ChatController extends Controller
                 $conversation->job_post_id = $jobPost->id;
                 $conversation->save();
                 $conversation->addParticipant($user);
-
             } else {
                 $conversation = $authUser->createConversationWith($user);
             }
@@ -217,12 +218,11 @@ class ChatController extends Controller
                     ->first();
 
                 if (!$conversation) {
-                    $conversation = $formUser->createGroup($jobPost->title . '-' . $toUser->name,$jobPost->user?->avatar);
+                    $conversation = $formUser->createGroup($jobPost->title . '-' . $toUser->name, $jobPost->user?->avatar);
                     $conversation->chat_type = 'job_post';
                     $conversation->job_post_id = $jobPost->id;
                     $conversation->save();
                     $conversation->addParticipant($toUser);
-
                 }
             } else {
                 $conversation = $formUser->conversations()
@@ -241,7 +241,6 @@ class ChatController extends Controller
                 if (!$conversation->participants->contains('participantable_id', $toUser->id)) {
                     $conversation->addParticipant($toUser);
                 }
-
             }
 
             // Handle file or text message
@@ -279,18 +278,39 @@ class ChatController extends Controller
             $participant = $chat->conversation->participant($toUser);
             if ($participant) {
                 broadcast(new NotifyParticipant($participant, $chat));
+
+                if ($toUser->role = 'user') {
+                    $fcmService = new FCMCustomerService();
+                    $fcmService->sendNotification(
+                        $toUser->firebaseTokens->token,
+                        $formUser->name . ' sent you a message',
+                        $request->message,
+                        [
+                            'conversation' => $chat
+                        ]
+                    );
+                } else {
+                    $fcmService = new FCMService();
+                    $fcmService->sendMessage(
+                        $toUser->firebaseTokens->token,
+                        $formUser->name . ' sent you a message',
+                        $request->message,
+                        [
+                            'conversation' => $chat
+                        ]
+                    );
+                }
             }
 
 
             $chat->conversation->load([
-                'messages' => fn ($q) => $q->with('attachment')->latest()->limit(1),
+                'messages' => fn($q) => $q->with('attachment')->latest()->limit(1),
                 'participants.participantable'
             ]);
-//            dd($conversation);
+            //            dd($conversation);
 
             DB::commit();
             return $this->success($chat, "Message sent successfully", 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error([], $e->getMessage(), 500);
